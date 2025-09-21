@@ -298,32 +298,6 @@ export default function YastaWelcomePage() {
           </p>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes slide {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(200%);
-          }
-        }
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
-        .animate-slide {
-          animation: slide 3s ease-in-out infinite;
-        }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 }

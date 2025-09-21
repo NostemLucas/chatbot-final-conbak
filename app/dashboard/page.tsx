@@ -67,7 +67,7 @@ export default function YastaLearningCards() {
     const interval = setInterval(() => {
       if (!selectedTopic) {
         // Solo animar cuando no hay modal abierto
-        executeAnimation("breathe");
+        executeAnimation("bounce");
       }
     }, 10000);
 
@@ -126,7 +126,7 @@ export default function YastaLearningCards() {
   const handleTopicClick = (topic: Topic, fromVoice: boolean = false) => {
     setSelectedTopic(topic);
 
-    executeAnimation("excited");
+    executeAnimation("flip");
 
     // Solo marcar como completado si NO viene del reconocimiento de voz
     // (porque ya se marcó en findByResponse)

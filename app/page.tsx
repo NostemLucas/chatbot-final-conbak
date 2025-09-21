@@ -1,16 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import {
-  Bot,
-  Sparkles,
-  Volume2,
-  Star,
-  Zap,
-  Crown,
-  Maximize2,
-  Minimize2,
-} from "lucide-react";
-import Clock from "@/components/Clock";
+import { Bot, Sparkles, Volume2, Maximize2, Minimize2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import InteractiveCoin, {
@@ -31,7 +21,6 @@ export default function YastaWelcomePage() {
 
   const router = useRouter();
 
-  // Función para ejecutar animaciones en la moneda
   const executeAnimation = (
     type: AnimationType,
     finalSide?: "front" | "back",
@@ -48,7 +37,7 @@ export default function YastaWelcomePage() {
   // Animaciones automáticas para dar vida a Sofia
   useEffect(() => {
     const interval = setInterval(() => {
-      const animations: AnimationType[] = ["breathe", "heartbeat", "celebrate"];
+      const animations: AnimationType[] = ["bounce", "heartbeat", "celebrate"];
       const randomAnimation =
         animations[Math.floor(Math.random() * animations.length)];
       executeAnimation(randomAnimation);
@@ -68,7 +57,7 @@ export default function YastaWelcomePage() {
   };
 
   const handleBeginConversation = () => {
-    executeAnimation("excited"); // Animación antes de navegar
+    executeAnimation("celebrate");
     setTimeout(() => {
       router.push("/dashboard");
     }, 1000);
@@ -80,7 +69,7 @@ export default function YastaWelcomePage() {
       if (!isFullscreen) {
         await document.documentElement.requestFullscreen();
         setIsFullscreen(true);
-        executeAnimation("zoom"); // Animación al entrar en fullscreen
+        executeAnimation("bounce");
       } else {
         await document.exitFullscreen();
         setIsFullscreen(false);

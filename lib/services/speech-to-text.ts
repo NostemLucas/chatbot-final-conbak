@@ -19,9 +19,8 @@ export class SpeechToTextService {
   private readonly speechClient: SpeechClient;
 
   constructor() {
-    this.speechClient = new SpeechClient({
-      keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-    });
+    const credentials = JSON.parse(process.env.GCP_KEY_FILE_CONTENT || "{}");
+    this.speechClient = new SpeechClient({ credentials });
   }
 
   async speechToText(

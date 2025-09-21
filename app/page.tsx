@@ -17,12 +17,13 @@ import InteractiveCoin, {
   type AnimationCommand,
   type AnimationType,
 } from "@/components/InteractiveCoin";
+import Link from "next/link";
 
 export default function YastaWelcomePage() {
   const [userName, setUserName] = useState("");
   const [showNameInput, setShowNameInput] = useState(false);
   const [sofiaMessage, setSofiaMessage] = useState(
-    "¡Hola! Soy Sof-IA, tu asistente virtual de Yasta. ¿Presona el botón para comenzar?"
+    "¡Hola! Soy Sof-IA, tu asistente virtual de Yasta. ¿Presiona el botón para comenzar?"
   );
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [animationCommand, setAnimationCommand] =
@@ -100,7 +101,6 @@ export default function YastaWelcomePage() {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  // Imágenes para las dos caras de la moneda
   const frontImage = "avatar/smile.png";
 
   const backImage =
@@ -108,7 +108,6 @@ export default function YastaWelcomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-teal-900 to-slate-800 relative overflow-hidden flex flex-col">
-      {/* Botón de pantalla completa - Discreto en la esquina superior derecha */}
       <button
         onClick={toggleFullscreen}
         className="fixed top-4 right-4 z-50 p-2 sm:p-3 bg-slate-800/60 hover:bg-slate-700/80 backdrop-blur-sm rounded-full border border-teal-400/30 transition-all duration-300 hover:scale-110 group"
@@ -154,54 +153,20 @@ export default function YastaWelcomePage() {
         />
       </div>
 
-      <div className="relative z-10 text-center pt-4 sm:pt-8 mb-4 sm:mb-6">
-        <div className="px-2 sm:px-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1 sm:gap-2">
-              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-teal-300 font-medium text-xs sm:text-sm">
-                EN VIVO
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 sm:gap-6">
-              <div className="text-teal-300 font-medium text-xs sm:text-sm">
-                Feria Tecnológica 2025
-              </div>
-              <div className="text-teal-200 font-medium text-xs sm:text-sm">
-                <Clock />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-4 text-xs sm:text-sm max-w-sm sm:max-w-none mx-auto">
-            <div className="flex items-center space-x-2 bg-slate-800/30 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-teal-400/20">
-              <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-teal-400 rounded-full" />
-              <span className="text-teal-200">100% Seguro</span>
-            </div>
-            <div className="flex items-center space-x-2 bg-slate-800/30 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-cyan-400/20">
-              <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-cyan-400 rounded-full" />
-              <span className="text-cyan-200">Instantáneo</span>
-            </div>
-            <div className="flex items-center space-x-2 bg-slate-800/30 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-cyan-400/20">
-              <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-blue-400 rounded-full" />
-              <span className="text-blue-200">Sin Comisiones</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="text-center mb-4 sm:mb-8 relative z-10 px-4">
+      <div className="text-center mb-4 sm:mb-8 relative z-10 px-4 mt-20">
         <div className="relative group h-auto">
-          <Image
-            src={"/logo.svg"}
-            width={300}
-            height={350}
-            alt="Yasta Logo"
-            className="mx-auto mb-2 sm:mb-4 w-[200px] sm:w-[300px] lg:w-[450px] h-auto"
-          />
+          <Link
+            href="https://banco-union-yasta-gamificacion.vercel.app/"
+            target="_blank"
+          >
+            <Image
+              src="/logo.svg"
+              width={300}
+              height={350}
+              alt="Yasta Logo"
+              className="mx-auto mb-2 sm:mb-4 w-[200px] sm:w-[300px] lg:w-[450px] h-auto cursor-pointer"
+            />
+          </Link>
         </div>
 
         <div className="bg-gradient-to-r from-slate-800/60 to-slate-700/60 backdrop-blur-sm rounded-2xl sm:rounded-full px-4 py-2 sm:px-8 sm:py-4 mt-3 sm:mt-6 border border-teal-400/30 relative overflow-hidden">
@@ -329,7 +294,7 @@ export default function YastaWelcomePage() {
 
         <div className="bg-slate-800/40 backdrop-blur-sm rounded-xl sm:rounded-2xl px-4 py-2 sm:px-8 sm:py-4 border border-teal-400/30 max-w-full sm:max-w-3xl mx-auto">
           <p className="text-teal-200 text-sm sm:text-base lg:text-lg font-medium">
-            Stand #15 - Zona Tecnología Digital - ExpoCurz 2025
+            Stand - Zona Tecnología Digital - ExpoCurz 2025
           </p>
         </div>
       </div>

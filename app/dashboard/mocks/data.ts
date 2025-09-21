@@ -173,7 +173,7 @@ export const yastaTopics = [
     icon: Smartphone,
     color: "from-orange-500 to-red-600",
     hasVideo: true,
-    urlVideo: "https://youtu.be/UrdtfbIIx8o?si=7_u_K9coZoWUA2bT",
+    urlVideo: "https://www.youtube.com/embed/UrdtfbIIx8o?si=AKwEkf9JCFN7Yr-S",
     intent: "recuperar-acceso",
     images: [
       {
@@ -215,7 +215,7 @@ export const yastaTopics = [
       "Consulta todos tus movimientos y transacciones realizadas en tu billetera",
     icon: FileText,
     color: "from-cyan-500 to-blue-600",
-    hasVideo: true,
+    hasVideo: false,
     urlVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     intent: "ver-extracto",
     images: [
@@ -264,7 +264,7 @@ export const yastaTopics = [
     icon: Gift,
     color: "from-pink-500 to-rose-600",
     hasVideo: true,
-    urlVideo: "https://youtube.com/shorts/Ijt0nz5dwr4?si=sODyLlyRyrB5vvcx ",
+    urlVideo: "https://www.youtube.com/embed/ljZh0y3Aveg?si=jpeHpdNJBEkhA90-",
     intent: "beneficios-yasta",
     images: [],
     content: {

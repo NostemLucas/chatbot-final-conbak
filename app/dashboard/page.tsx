@@ -36,6 +36,18 @@ export default function YastaLearningCards() {
   );
 
   const router = useRouter();
+
+  // Función para marcar un tema como completado
+  const markTopicAsCompleted = (topicId: number) => {
+    setCompletedTopics((prevCompleted) => {
+      if (!prevCompleted.includes(topicId)) {
+        console.log(`✅ Tema ${topicId} marcado como completado`);
+        return [...prevCompleted, topicId];
+      }
+      return prevCompleted;
+    });
+  };
+
   // Función para ejecutar animaciones en Sof-IA
   const executeAnimation = (
     type: AnimationType,
@@ -69,36 +81,69 @@ export default function YastaLearningCards() {
     if (progress === 1) {
       // Completó todo - celebración
       executeAnimation("celebrate");
+      setSofiaMessage(
+        "¡🎉 INCREÍBLE! Has completado todos los temas de Yasta. Ahora eres un experto en billeteras móviles. ¡Ve a jugar y ganar premios!"
+      );
     } else if (progress >= 0.5) {
       // Más del 50% - brillo
       executeAnimation("glow");
+      setSofiaMessage(
+        "¡Excelente progreso! Ya dominas más de la mitad de los temas. ¡Sigue así para convertirte en un experto!"
+      );
     } else if (completedTopics.length > 0) {
       // Progreso inicial - latido suave
       executeAnimation("heartbeat");
+      setSofiaMessage(
+        `¡Muy bien! Has completado ${completedTopics.length} tema${
+          completedTopics.length > 1 ? "s" : ""
+        }. Continúa aprendiendo para dominar Yasta completamente.`
+      );
     }
   }, [completedTopics.length]);
 
+  // 🔧 FUNCIÓN CORREGIDA: findByResponse ahora marca como completado automáticamente
   const findByResponse = (intent: string) => {
     const topic = yastaTopics.find((topic) => topic.intent === intent);
     if (topic) {
-      console.log("Intento detectado:", intent, "Abriendo tema:", topic.title);
-      handleTopicClick(topic);
+      console.log(
+        "🎯 Intent detectado:",
+        intent,
+        "Abriendo tema:",
+        topic.title
+      );
+
+      // ✅ MARCAR COMO COMPLETADO INMEDIATAMENTE cuando viene del reconocimiento de voz
+      markTopicAsCompleted(topic.id);
+
+      // Abrir el modal del tema
+      handleTopicClick(topic, true); // true indica que viene de reconocimiento de voz
+    } else {
+      console.log("❌ No se encontró tema para el intent:", intent);
     }
   };
 
-  const handleTopicClick = (topic: Topic) => {
+  // 🔧 FUNCIÓN ACTUALIZADA: handleTopicClick ahora recibe parámetro para saber el origen
+  const handleTopicClick = (topic: Topic, fromVoice: boolean = false) => {
     setSelectedTopic(topic);
 
-    // Animar cuando se selecciona un tema
     executeAnimation("excited");
 
-    if (!completedTopics.includes(topic.id)) {
-      setCompletedTopics([...completedTopics, topic.id]);
+    // Solo marcar como completado si NO viene del reconocimiento de voz
+    // (porque ya se marcó en findByResponse)
+    if (!fromVoice) {
+      markTopicAsCompleted(topic.id);
     }
 
-    setSofiaMessage(
-      `¡Excelente elección! Ahora sabes todo sobre "${topic.title}". ¿Te gustaría aprender sobre otro tema?`
-    );
+    // Mensaje personalizado según el origen
+    if (fromVoice) {
+      setSofiaMessage(
+        `¡Perfecto! Reconocí tu voz y te mostré "${topic.title}". Este tema ya está completado. ¿Quieres aprender sobre otro tema?`
+      );
+    } else {
+      setSofiaMessage(
+        `¡Excelente elección! Ahora sabes todo sobre "${topic.title}". ¿Te gustaría aprender sobre otro tema?`
+      );
+    }
   };
 
   const goToGames = () => {
@@ -115,7 +160,6 @@ export default function YastaLearningCards() {
 
   function removeTopic() {
     setSelectedTopic(null);
-    // Pequeña animación al cerrar modal
     executeAnimation("pulse");
   }
 
@@ -124,15 +168,22 @@ export default function YastaLearningCards() {
     const progress = completedTopics.length / 7;
 
     if (progress === 1) {
-      executeAnimation("celebrate"); // Si completó todo, celebrar
+      executeAnimation("celebrate");
     } else if (progress >= 0.5) {
-      executeAnimation("showBack", "back", 3000); // Mostrar progreso
+      executeAnimation("showBack", "back", 3000);
     } else {
-      executeAnimation("heartbeat"); // Motivar a continuar
+      executeAnimation("heartbeat");
     }
   };
 
-  // Imágenes personalizadas para Sof-IA en modo aprendizaje
+  const resetProgress = () => {
+    setCompletedTopics([]);
+    setSofiaMessage(
+      "Progreso reiniciado. ¡Empecemos de nuevo tu aprendizaje sobre Yasta!"
+    );
+    executeAnimation("flip");
+  };
+
   const frontImage = "avatar/smile.png";
 
   const backImage = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='58' fill='%23059669' stroke='%23047857' stroke-width='2'/%3E%3Ctext x='60' y='25' font-family='Arial' font-size='12' text-anchor='middle' fill='%23FFF' font-weight='bold'%3EPROGRESO%3C/text%3E%3Ccircle cx='60' cy='50' r='25' fill='none' stroke='%23FFF' stroke-width='3'/%3E%3Ccircle cx='60' cy='50' r='25' fill='none' stroke='%2306B6D4' stroke-width='3' stroke-dasharray='${
@@ -155,6 +206,18 @@ export default function YastaLearningCards() {
       </div>
 
       <VoiceTopBar handleResponse={findByResponse} />
+
+      {/* 🔧 BOTÓN DE DEBUG (solo visible en desarrollo) */}
+      {process.env.NODE_ENV === "development" && (
+        <div className="fixed top-4 right-4 z-50">
+          <button
+            onClick={resetProgress}
+            className="px-3 py-2 bg-red-500/80 text-white text-xs rounded-lg hover:bg-red-600/80"
+          >
+            Reset Progreso
+          </button>
+        </div>
+      )}
 
       <div className="text-center mb-6 sm:mb-12 lg:mb-16 relative z-10 mt-18">
         <div className="mb-3 sm:mb-6">
@@ -271,7 +334,7 @@ export default function YastaLearningCards() {
               <CardItem
                 key={topic.id}
                 isCompleted={isCompleted}
-                onClick={handleTopicClick}
+                onClick={(topic) => handleTopicClick(topic, false)} // false = click manual
                 topic={topic}
               />
             );

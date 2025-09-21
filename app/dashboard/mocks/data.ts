@@ -264,22 +264,9 @@ export const yastaTopics = [
     icon: Gift,
     color: "from-pink-500 to-rose-600",
     hasVideo: true,
-    urlVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    urlVideo: "https://youtube.com/shorts/Ijt0nz5dwr4?si=sODyLlyRyrB5vvcx ",
     intent: "beneficios-yasta",
-    images: [
-      {
-        url: "/topics/beneficios-general.jpg",
-        description: "Infografía con los principales beneficios de Yasta",
-      },
-      {
-        url: "/topics/seguridad-yasta.jpg",
-        description: "Características de seguridad de la billetera móvil",
-      },
-      {
-        url: "/topics/disponibilidad-24-7.jpg",
-        description: "Disponibilidad de servicios las 24 horas del día",
-      },
-    ],
+    images: [],
     content: {
       intro:
         "Yasta te ofrece múltiples beneficios que hacen más fácil y segura tu vida financiera, con disponibilidad total y costos reducidos.",
@@ -303,24 +290,10 @@ export const yastaTopics = [
       "Conoce los límites diarios y mensuales para diferentes tipos de operaciones",
     icon: TrendingUp,
     color: "from-indigo-500 to-purple-600",
-    hasVideo: true,
+    hasVideo: false,
     urlVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     intent: "limites-transacciones",
-    images: [
-      {
-        url: "/topics/limites-diarios.jpg",
-        description: "Tabla con límites diarios por tipo de transacción",
-      },
-      {
-        url: "/topics/limites-mensuales.jpg",
-        description: "Límites mensuales y acumulados de operaciones",
-      },
-      {
-        url: "/topics/upgrade-cuenta.jpg",
-        description:
-          "Opciones para aumentar límites con verificación adicional",
-      },
-    ],
+    images: [],
     content: {
       intro:
         "Yasta maneja diferentes límites de transacción para garantizar la seguridad de tu dinero. Conoce cuánto puedes mover según el tipo de operación.",

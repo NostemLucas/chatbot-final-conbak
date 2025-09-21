@@ -50,10 +50,12 @@ export class DialogflowService {
     }
 
     // Opción 3: Usar JSON completo desde variable de entorno
-    if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+    if (process.env.GCP_CREDENTIALS_BASE64) {
       try {
         return {
-          credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
+          credentials: JSON.parse(
+            Buffer.from(process.env.GCP_CREDENTIALS_BASE64, "base64").toString()
+          ).replace(/\\n/g, "\n"), // Convierte \\n a saltos de línea reales
         };
       } catch (error) {
         console.error("Error parsing GOOGLE_SERVICE_ACCOUNT_KEY:", error);

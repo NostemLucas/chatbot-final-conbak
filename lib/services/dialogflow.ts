@@ -1,4 +1,5 @@
 import { SessionsClient, protos } from "@google-cloud/dialogflow";
+import { GCPCredentialsManager } from "./gcp-credentials";
 
 export interface DialogflowResponse {
   queryText: string;
@@ -15,55 +16,50 @@ export interface DialogflowConfig {
 }
 
 export class DialogflowService {
-  private readonly sessionClient: SessionsClient;
+  private sessionClient: SessionsClient;
+  private readonly gcpManager: GCPCredentialsManager;
   private readonly projectId: string;
   private readonly languageCode: string;
 
   constructor(config?: DialogflowConfig) {
-    // Usar variables de entorno con fallback
-    this.projectId =
-      config?.projectId ||
-      process.env.DIALOGFLOW_PROJECT_ID ||
-      "text-vertex-speak";
+    this.gcpManager = GCPCredentialsManager.getInstance();
+
+    // Configurar project ID con fallback
+    this.projectId = config?.projectId || this.gcpManager.getProjectId(); // Usa el método del manager que ya tiene fallbacks
+
     this.languageCode = config?.languageCode || "es";
 
-    // Configuración de credenciales para Next.js
-    const clientOptions = this.getClientOptions();
-    this.sessionClient = new SessionsClient(clientOptions);
-  }
-
-  private getClientOptions() {
-    // Opción 1: Usar archivo de credenciales (desarrollo local)
-    if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-      return { keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS };
-    }
-
-    // Opción 2: Usar credenciales individuales (producción recomendada)
-    if (process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
-      return {
-        credentials: {
-          client_email: process.env.GOOGLE_CLIENT_EMAIL,
-          private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-          project_id: this.projectId,
-        },
-      };
-    }
-
-    // Opción 3: Usar JSON completo desde variable de entorno
-    if (process.env.GCP_CREDENTIALS_BASE64) {
-      try {
-        return {
-          credentials: JSON.parse(
-            Buffer.from(process.env.GCP_CREDENTIALS_BASE64, "base64").toString()
-          ).replace(/\\n/g, "\n"), // Convierte \\n a saltos de línea reales
-        };
-      } catch (error) {
-        console.error("Error parsing GOOGLE_SERVICE_ACCOUNT_KEY:", error);
+    try {
+      // Validar credenciales
+      if (!this.gcpManager.validateCredentials()) {
+        throw new Error(
+          "No se pudieron validar las credenciales de GCP para Dialogflow"
+        );
       }
-    }
 
-    // Fallback: usar credenciales por defecto del ambiente
-    return {};
+      // Inicializar cliente con credenciales del manager
+      const clientOptions = this.gcpManager.getClientOptions();
+
+      this.sessionClient = new SessionsClient({
+        ...clientOptions,
+        // Override projectId si es necesario
+        projectId: this.projectId,
+      });
+
+      console.log(`Dialogflow client inicializado exitosamente`);
+      console.log(`- Project ID: ${this.projectId}`);
+      console.log(`- Language Code: ${this.languageCode}`);
+      console.log(
+        `- Credentials Source: ${this.gcpManager.getCredentialsSource()}`
+      );
+    } catch (error) {
+      console.error("Error inicializando Dialogflow client:", error);
+      throw new Error(
+        `Fallo al inicializar Dialogflow service: ${
+          error instanceof Error ? error.message : "Error desconocido"
+        }`
+      );
+    }
   }
 
   /**

@@ -191,7 +191,8 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   }
   100% {
-    box-shadow: 0 20px 60px rgba(85, 170, 170, 0.4), 0 0 0 1px rgba(85, 170, 170, 0.3);
+    box-shadow: 0 20px 60px rgba(85, 170, 170, 0.4),
+      0 0 0 1px rgba(85, 170, 170, 0.3);
   }
 }
 
@@ -240,7 +241,12 @@
 }
 
 .text-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
   background-size: 200% 100%;
   animation: text-shimmer 2s ease-in-out infinite;
   -webkit-background-clip: text;
@@ -258,5 +264,6 @@
 }
 
 .neon-glow {
-  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor,
+    0 0 30px currentColor;
 }

@@ -47,16 +47,16 @@ export const yastaTopics = [
     intent: "enviar-recibir-dinero",
     images: [
       {
-        url: "/img/envio-paso1.jpg",
+        url: "/topics/enviar-dinero/1.png",
         description:
           "Pantalla principal de Yasta con la opción 'Enviar dinero'",
       },
       {
-        url: "/img/envio-paso2.jpg",
+        url: "/topics/enviar-dinero/2.png",
         description: "Ingreso del número de celular del destinatario",
       },
       {
-        url: "/img/envio-paso3.jpg",
+        url: "/topics/enviar-dinero/3.png",
         description: "Confirmación del monto y datos del destinatario",
       },
     ],
@@ -88,16 +88,20 @@ export const yastaTopics = [
     intent: "pago-servicios",
     images: [
       {
-        url: "/img/servicios-menu.jpg",
+        url: "/topics/la-paz/1.png",
         description:
           "Menú de pagos con diferentes opciones de servicios disponibles",
       },
       {
-        url: "/img/pago-luz-form.jpg",
-        description: "Formulario para ingresar datos del servicio de luz",
+        url: "/topics/la-paz/2.png",
+        description: "Seleciona el servicio que deseas pagar",
       },
       {
-        url: "/img/confirmacion-pago.jpg",
+        url: "/topics/la-paz/3.png",
+        description: "Seleciona los datos solicitados",
+      },
+      {
+        url: "/topics/la-paz/3.png",
         description: "Pantalla de confirmación del pago realizado",
       },
     ],
@@ -128,16 +132,19 @@ export const yastaTopics = [
     intent: "retiro-cajero",
     images: [
       {
-        url: "/img/generar-codigo.jpg",
-        description: "Pantalla para generar código de retiro en la app",
+        url: "/topics/retiro-efectivo/1.png",
+        description: "Ingresa a la billetera y selecciona 'Retiro'",
       },
       {
-        url: "/img/cajero-sin-tarjeta.jpg",
-        description:
-          "Opción 'Sin tarjeta' en el cajero automático de Banco Unión",
+        url: "/topics/retiro-efectivo/2.png",
+        description: "Ingresa el monto que deseas retirar y genera el código",
       },
       {
-        url: "/img/ingreso-codigo-cajero.jpg",
+        url: "/topics/retiro-efectivo/3.png",
+        description: "La app generara un codigo qeu podras usar en el cajero",
+      },
+      {
+        url: "/topics/retiro-efectivo/4.png",
         description: "Pantalla del cajero para ingresar el código de 6 dígitos",
       },
     ],
@@ -166,20 +173,24 @@ export const yastaTopics = [
     icon: Smartphone,
     color: "from-orange-500 to-red-600",
     hasVideo: true,
-    urlVideo: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    urlVideo: "https://youtu.be/UrdtfbIIx8o?si=7_u_K9coZoWUA2bT",
     intent: "recuperar-acceso",
     images: [
       {
-        url: "/img/olvide-pin.jpg",
-        description: "Pantalla de inicio con opción 'Olvidé mi PIN'",
+        url: "/topics/cambio-dispositivo/1.png",
+        description: "Descarga yasta desde la tienda de aplicaciones.'",
       },
       {
-        url: "/img/verificacion-datos.jpg",
-        description: "Formulario de verificación de datos personales",
+        url: "/topics/cambio-dispositivo/2.png",
+        description: "Ingresa con tu numero de celular asociado a yasta",
       },
       {
-        url: "/img/nuevo-pin.jpg",
-        description: "Pantalla para crear un nuevo PIN de acceso",
+        url: "/topics/cambio-dispositivo/3.png",
+        description: "Ingreasa tu contraseña",
+      },
+      {
+        url: "/topics/cambio-dispositivo/4.png",
+        description: "Registro de smsm enviado a tu nuevo dispositivo",
       },
     ],
     content: {
@@ -209,15 +220,23 @@ export const yastaTopics = [
     intent: "ver-extracto",
     images: [
       {
-        url: "/img/menu-movimientos.jpg",
+        url: "/topics/extractos/1.png",
         description: "Ubicación del menú 'Movimientos' en la app",
       },
       {
-        url: "/img/historial-transacciones.jpg",
+        url: "/topics/extractos/2.png",
         description: "Lista detallada de todas las transacciones realizadas",
       },
       {
-        url: "/img/filtros-extracto.jpg",
+        url: "/topics/extractos/3.png",
+        description: "Opciones de filtrado por fecha y tipo de transacción",
+      },
+      {
+        url: "/topics/extractos/4.png",
+        description: "Opciones de filtrado por fecha y tipo de transacción",
+      },
+      {
+        url: "/topics/extractos/5.png",
         description: "Opciones de filtrado por fecha y tipo de transacción",
       },
     ],
@@ -249,15 +268,15 @@ export const yastaTopics = [
     intent: "beneficios-yasta",
     images: [
       {
-        url: "/img/beneficios-general.jpg",
+        url: "/topics/beneficios-general.jpg",
         description: "Infografía con los principales beneficios de Yasta",
       },
       {
-        url: "/img/seguridad-yasta.jpg",
+        url: "/topics/seguridad-yasta.jpg",
         description: "Características de seguridad de la billetera móvil",
       },
       {
-        url: "/img/disponibilidad-24-7.jpg",
+        url: "/topics/disponibilidad-24-7.jpg",
         description: "Disponibilidad de servicios las 24 horas del día",
       },
     ],
@@ -289,15 +308,15 @@ export const yastaTopics = [
     intent: "limites-transacciones",
     images: [
       {
-        url: "/img/limites-diarios.jpg",
+        url: "/topics/limites-diarios.jpg",
         description: "Tabla con límites diarios por tipo de transacción",
       },
       {
-        url: "/img/limites-mensuales.jpg",
+        url: "/topics/limites-mensuales.jpg",
         description: "Límites mensuales y acumulados de operaciones",
       },
       {
-        url: "/img/upgrade-cuenta.jpg",
+        url: "/topics/upgrade-cuenta.jpg",
         description:
           "Opciones para aumentar límites con verificación adicional",
       },

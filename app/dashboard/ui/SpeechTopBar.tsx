@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Mic, MicOff, Volume2, Radio, Sparkles, Zap } from "lucide-react";
+import {
+  Mic,
+  MicOff,
+  Volume2,
+  Radio,
+  Sparkles,
+  Zap,
+  Settings,
+  Menu,
+} from "lucide-react";
 
 // Interfaces
 interface DialogflowResponse {
@@ -123,29 +132,24 @@ function CircularProgress({
   );
 }
 
-// Componente de ondas de audio
+// Componente de ondas de audio más sutil
 function AudioWaves({ isActive }: { isActive: boolean }) {
   if (!isActive) return null;
 
   return (
     <div className="absolute inset-0 flex items-center justify-center">
-      <div className="flex space-x-1">
-        <div
-          className="w-1 bg-gradient-to-t from-teal-500 to-cyan-400 rounded-full animate-pulse"
-          style={{ height: "8px", animationDelay: "0ms" }}
-        />
-        <div
-          className="w-1 bg-gradient-to-t from-teal-500 to-cyan-400 rounded-full animate-pulse"
-          style={{ height: "12px", animationDelay: "150ms" }}
-        />
-        <div
-          className="w-1 bg-gradient-to-t from-teal-500 to-cyan-400 rounded-full animate-pulse"
-          style={{ height: "6px", animationDelay: "300ms" }}
-        />
-        <div
-          className="w-1 bg-gradient-to-t from-teal-500 to-cyan-400 rounded-full animate-pulse"
-          style={{ height: "10px", animationDelay: "450ms" }}
-        />
+      <div className="flex space-x-0.5">
+        {[0, 150, 300, 450].map((delay, index) => (
+          <div
+            key={index}
+            className="w-0.5 bg-gradient-to-t from-teal-500/60 to-cyan-400/60 rounded-full animate-pulse"
+            style={{
+              height: `${4 + (index % 2) * 2}px`,
+              animationDelay: `${delay}ms`,
+              animationDuration: "1.5s",
+            }}
+          />
+        ))}
       </div>
     </div>
   );
@@ -341,10 +345,9 @@ export default function VoiceTopBar({
       }
 
       if (!isRecording && !isProcessing && !isPlayingAudio) {
-        // Reinicio más rápido después de error
         setTimeout(() => {
           startContinuousListening();
-        }, 1000); // Reducido de 2000ms a 1000ms
+        }, 1000);
       }
     };
 
@@ -352,10 +355,9 @@ export default function VoiceTopBar({
       setInternalIsListening(false);
 
       if (!isRecording && !isProcessing && !isPlayingAudio) {
-        // Reducir delay para reinicio más rápido
         setTimeout(() => {
           startContinuousListening();
-        }, 500); // Reducido de 1000ms a 500ms
+        }, 500);
       }
     };
 
@@ -371,10 +373,9 @@ export default function VoiceTopBar({
       try {
         recognitionRef.current.start();
       } catch (err) {
-        // Reinicio más rápido después de error
         setTimeout(() => {
           initializeContinuousListening();
-        }, 1000); // Reducido de 2000ms a 1000ms
+        }, 1000);
       }
     }
   };
@@ -436,7 +437,7 @@ export default function VoiceTopBar({
 
       mediaRecorder.start();
       setInternalIsRecording(true);
-      onRecordingStart?.(); // Notificar al padre
+      onRecordingStart?.();
       setTimeLeft(5);
       setError("");
 
@@ -480,7 +481,7 @@ export default function VoiceTopBar({
     ) {
       mediaRecorderRef.current.stop();
       setInternalIsRecording(false);
-      onRecordingStop?.(); // Notificar al padre
+      onRecordingStop?.();
       setInternalIsProcessing(true);
     }
   };
@@ -504,7 +505,6 @@ export default function VoiceTopBar({
       setInternalIsProcessing(false);
       setLastIntent(data.dialogflow.intent);
 
-      // Notificar al padre sobre el intent detectado
       onIntentDetected?.(
         data.dialogflow.intent,
         data.dialogflow.fulfillmentText
@@ -515,7 +515,6 @@ export default function VoiceTopBar({
         await speakResponse(data.dialogflow.fulfillmentText);
       }
 
-      // Reiniciar inmediatamente después de hablar
       setTimeout(() => {
         restartListening();
       }, 100);
@@ -590,14 +589,13 @@ export default function VoiceTopBar({
 
     restartListeningTimeoutRef.current = setTimeout(() => {
       initializeContinuousListening();
-    }, 500); // Reducido de 1000ms a 500ms para reinicio más rápido
+    }, 500);
   };
 
   const toggleListening = (): void => {
     if (onListeningToggle) {
-      onListeningToggle(); // Delegar al padre
+      onListeningToggle();
     } else {
-      // Fallback si no hay padre controlando
       if (isListening) {
         stopContinuousListening();
       } else {
@@ -609,17 +607,15 @@ export default function VoiceTopBar({
   const manualRecord = (): void => {
     if (!isRecording && !isProcessing && !isPlayingAudio) {
       if (onRecordingStart) {
-        onRecordingStart(); // Notificar al padre
+        onRecordingStart();
       } else {
-        // Fallback si no hay padre controlando
         stopContinuousListening();
         startRecording();
       }
     } else if (isRecording) {
       if (onRecordingStop) {
-        onRecordingStop(); // Notificar al padre
+        onRecordingStop();
       } else {
-        // Fallback si no hay padre controlando
         stopRecording();
       }
     }
@@ -627,233 +623,199 @@ export default function VoiceTopBar({
 
   return (
     <div
-      className={`w-full bg-gradient-to-r from-slate-800/90 via-slate-800/95 to-slate-800/90 backdrop-blur-xl border-b border-teal-500/20 shadow-xl ${className}`}
+      className={`w-full bg-white/5 backdrop-blur-xl border-b border-white/10 shadow-2xl ${className}`}
     >
-      {/* Línea superior decorativa */}
-      <div className="h-px bg-gradient-to-r from-transparent via-teal-400/50 to-transparent"></div>
+      {/* Barra superior con gradiente sutil */}
+      <div className="h-px bg-gradient-to-r from-transparent via-teal-400/30 to-transparent" />
 
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo/Marca con efectos mejorados */}
-          <div className="flex items-center space-x-3">
+      <div className="max-w-6xl mx-auto px-4 py-2.5">
+        <div className="flex items-center justify-between gap-6">
+          {/* Logo compacto */}
+          <div className="flex items-center gap-3 flex-shrink-0">
             <div className="relative">
-              <div className="w-8 h-8 bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-500 rounded-lg flex items-center justify-center shadow-lg">
-                <Sparkles className="w-4 h-4 text-white" />
-                {/* Brillo animado */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-lg animate-pulse"></div>
+              <div className="w-7 h-7 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg">
+                <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
-              {/* Aura de resplandor */}
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-400/30 to-cyan-500/30 rounded-lg blur-md -z-10 animate-pulse"></div>
+              <div className="absolute inset-0 bg-teal-400/20 rounded-lg blur-sm animate-pulse" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold bg-gradient-to-r from-teal-200 to-cyan-300 bg-clip-text text-transparent">
+
+            <div>
+              <h1 className="text-lg font-bold bg-gradient-to-r from-teal-200 to-cyan-300 bg-clip-text text-transparent">
                 Sof-IA
-              </span>
-              <span className="text-xs text-slate-400 -mt-1">
+              </h1>
+              <p className="text-xs text-slate-400 leading-none">
                 Asistente Virtual
-              </span>
+              </p>
             </div>
           </div>
 
-          {/* Controles de voz mejorados */}
-          <div className="flex items-center space-x-6">
-            {/* Botón de activar/desactivar escucha */}
-            <div className="relative">
-              <button
-                onClick={toggleListening}
-                disabled={isRecording || isProcessing || isPlayingAudio}
-                className={`relative w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 border-2 ${
-                  isListening
-                    ? "bg-gradient-to-br from-teal-500/20 to-cyan-600/20 border-teal-400/50 shadow-teal-400/25"
-                    : "bg-gradient-to-br from-slate-600/20 to-slate-700/20 border-slate-500/50"
+          {/* Controles de voz centrales */}
+          <div className="flex items-center gap-4">
+            {/* Botón de escucha compacto */}
+            <button
+              onClick={toggleListening}
+              disabled={isRecording || isProcessing || isPlayingAudio}
+              className={`relative w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 transform hover:scale-105 disabled:opacity-50 border ${
+                isListening
+                  ? "bg-teal-500/20 border-teal-400/50 shadow-lg shadow-teal-400/20"
+                  : "bg-slate-600/20 border-slate-500/30 hover:bg-slate-500/20"
+              }`}
+              title={isListening ? "Desactivar escucha" : "Activar escucha"}
+            >
+              <Radio
+                className={`w-3.5 h-3.5 ${
+                  isListening ? "text-teal-300" : "text-slate-400"
                 }`}
-                title={isListening ? "Desactivar escucha" : "Activar escucha"}
-              >
-                <Radio
-                  className={`w-5 h-5 transition-colors ${
-                    isListening ? "text-teal-300" : "text-slate-400"
-                  }`}
-                />
+              />
 
-                {/* Ondas de audio cuando está escuchando */}
-                <AudioWaves
-                  isActive={
-                    isListening &&
-                    !isRecording &&
-                    !isProcessing &&
-                    !isPlayingAudio
-                  }
-                />
-
-                {/* Indicador en vivo mejorado */}
-                {isListening &&
+              {/* Mini ondas de audio */}
+              <AudioWaves
+                isActive={
+                  isListening &&
                   !isRecording &&
                   !isProcessing &&
-                  !isPlayingAudio && (
-                    <>
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-ping" />
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full" />
-                    </>
-                  )}
-              </button>
-            </div>
-
-            {/* Botón principal de micrófono mejorado */}
-            <div className="relative">
-              <button
-                onClick={manualRecord}
-                disabled={isProcessing || isPlayingAudio}
-                className={`relative w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-xl disabled:opacity-50 border-2 ${
-                  isRecording
-                    ? "bg-gradient-to-br from-red-500/20 to-red-600/20 border-red-400/60 shadow-red-400/30 animate-pulse"
-                    : isProcessing
-                    ? "bg-gradient-to-br from-blue-500/20 to-blue-600/20 border-blue-400/60 shadow-blue-400/30"
-                    : isPlayingAudio
-                    ? "bg-gradient-to-br from-green-500/20 to-green-600/20 border-green-400/60 shadow-green-400/30"
-                    : "bg-gradient-to-br from-teal-500/20 to-cyan-600/20 border-teal-400/60 shadow-teal-400/30"
-                }`}
-                title={
-                  isRecording
-                    ? "Grabando... (click para detener)"
-                    : isProcessing
-                    ? "Procesando..."
-                    : isPlayingAudio
-                    ? "Hablando..."
-                    : "Grabar mensaje"
+                  !isPlayingAudio
                 }
-              >
-                {/* Progreso circular durante grabación */}
-                {isRecording && (
-                  <CircularProgress
-                    progress={progress}
-                    size={56}
-                    strokeWidth={3}
-                  />
-                )}
+              />
 
-                {/* Efectos de fondo dinámicos */}
-                <div
-                  className={`absolute inset-0 rounded-2xl transition-all duration-300 ${
-                    isRecording
-                      ? "bg-gradient-to-br from-red-500/10 to-red-600/10"
-                      : isProcessing
-                      ? "bg-gradient-to-br from-blue-500/10 to-blue-600/10"
-                      : isPlayingAudio
-                      ? "bg-gradient-to-br from-green-500/10 to-green-600/10"
-                      : "bg-gradient-to-br from-teal-500/10 to-cyan-600/10"
-                  }`}
-                />
-
-                {/* Iconos según estado */}
-                {isRecording ? (
-                  <Mic className="w-7 h-7 text-red-400 animate-pulse relative z-10" />
-                ) : isProcessing ? (
-                  <div className="relative z-10">
-                    <div className="w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-                    <Zap className="absolute inset-0 w-3 h-3 text-blue-400 animate-pulse m-1.5" />
-                  </div>
-                ) : isPlayingAudio ? (
-                  <Volume2 className="w-7 h-7 text-green-400 animate-pulse relative z-10" />
-                ) : (
-                  <Mic className="w-7 h-7 text-teal-300 relative z-10" />
-                )}
-
-                {/* Auras de resplandor según estado */}
-                <div
-                  className={`absolute inset-0 rounded-2xl blur-lg -z-10 transition-all duration-300 ${
-                    isRecording
-                      ? "bg-gradient-to-br from-red-400/20 to-red-500/20 animate-pulse"
-                      : isProcessing
-                      ? "bg-gradient-to-br from-blue-400/20 to-blue-500/20 animate-pulse"
-                      : isPlayingAudio
-                      ? "bg-gradient-to-br from-green-400/20 to-green-500/20 animate-pulse"
-                      : "bg-gradient-to-br from-teal-400/20 to-cyan-500/20"
-                  }`}
-                />
-              </button>
-
-              {/* Indicador de tiempo durante grabación mejorado */}
-              {isRecording && (
-                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
-                  <div className="px-2 py-1 bg-red-900/80 border border-red-500/50 rounded-lg backdrop-blur-sm">
-                    <span className="text-xs font-mono text-red-300">
-                      {timeLeft}s
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Estado/Error mejorado */}
-          <div className="flex items-center space-x-3 min-w-[220px] justify-end">
-            {/* Indicador visual de estado */}
-            <div
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                error
-                  ? "bg-red-400 animate-pulse"
-                  : isRecording
-                  ? "bg-red-400 animate-ping"
-                  : isProcessing
-                  ? "bg-blue-400 animate-pulse"
-                  : isPlayingAudio
-                  ? "bg-green-400 animate-pulse"
-                  : isListening
-                  ? "bg-teal-400 animate-ping"
-                  : "bg-slate-500"
-              }`}
-            />
-
-            {/* Texto de estado */}
-            <div className="text-right">
-              <div
-                className={`text-sm font-medium transition-colors duration-300 ${
-                  error
-                    ? "text-red-400"
-                    : isRecording
-                    ? "text-red-400"
-                    : isProcessing
-                    ? "text-blue-400"
-                    : isPlayingAudio
-                    ? "text-green-400"
-                    : isListening
-                    ? "text-teal-400"
-                    : "text-slate-400"
-                }`}
-              >
-                {error
-                  ? error
-                  : isRecording
-                  ? "Grabando..."
-                  : isProcessing
-                  ? "Procesando..."
-                  : isPlayingAudio
-                  ? "Hablando..."
-                  : isListening
-                  ? "Esperando..."
-                  : "Inactivo"}
-              </div>
-
-              {/* Subtexto informativo */}
+              {/* Indicador live más pequeño */}
               {isListening &&
                 !isRecording &&
                 !isProcessing &&
                 !isPlayingAudio && (
-                  <div className="text-xs text-teal-300/70">Di "Hey Sofia"</div>
+                  <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-400 rounded-full animate-ping" />
+                )}
+            </button>
+
+            {/* Botón principal de micrófono más compacto */}
+            <div className="relative">
+              <button
+                onClick={manualRecord}
+                disabled={isProcessing || isPlayingAudio}
+                className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105 disabled:opacity-50 border-2 ${
+                  isRecording
+                    ? "bg-red-500/20 border-red-400/60 shadow-lg shadow-red-400/20 animate-pulse"
+                    : isProcessing
+                    ? "bg-blue-500/20 border-blue-400/60 shadow-lg shadow-blue-400/20"
+                    : isPlayingAudio
+                    ? "bg-green-500/20 border-green-400/60 shadow-lg shadow-green-400/20"
+                    : "bg-teal-500/20 border-teal-400/60 shadow-lg shadow-teal-400/20 hover:shadow-teal-400/30"
+                }`}
+              >
+                {/* Progreso circular más delgado */}
+                {isRecording && (
+                  <CircularProgress
+                    progress={progress}
+                    size={40}
+                    strokeWidth={2}
+                  />
                 )}
 
-              {lastTranscript && !isRecording && !isProcessing && (
-                <div className="text-xs text-slate-400 max-w-[150px] truncate">
-                  "{lastTranscript}"
+                {/* Iconos según estado */}
+                {isRecording ? (
+                  <Mic className="w-4 h-4 text-red-400 animate-pulse relative z-10" />
+                ) : isProcessing ? (
+                  <div className="relative z-10">
+                    <div className="w-4 h-4 border border-blue-400 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                ) : isPlayingAudio ? (
+                  <Volume2 className="w-4 h-4 text-green-400 animate-pulse relative z-10" />
+                ) : (
+                  <Mic className="w-4 h-4 text-teal-300 relative z-10" />
+                )}
+              </button>
+
+              {/* Timer más discreto */}
+              {isRecording && (
+                <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
+                  <div className="px-1.5 py-0.5 bg-red-900/60 border border-red-500/30 rounded text-xs font-mono text-red-300 backdrop-blur-sm">
+                    {timeLeft}s
+                  </div>
                 </div>
               )}
             </div>
           </div>
+
+          {/* Panel de estado compacto */}
+          <div className="flex items-center gap-3 min-w-0 flex-1 justify-end">
+            {/* Indicador de estado minimalista */}
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                  error
+                    ? "bg-red-400"
+                    : isRecording
+                    ? "bg-red-400 animate-pulse"
+                    : isProcessing
+                    ? "bg-blue-400 animate-pulse"
+                    : isPlayingAudio
+                    ? "bg-green-400 animate-pulse"
+                    : isListening
+                    ? "bg-teal-400"
+                    : "bg-slate-500"
+                }`}
+              />
+
+              <div className="min-w-0">
+                <div
+                  className={`text-sm font-medium transition-colors duration-200 ${
+                    error
+                      ? "text-red-400"
+                      : isRecording
+                      ? "text-red-400"
+                      : isProcessing
+                      ? "text-blue-400"
+                      : isPlayingAudio
+                      ? "text-green-400"
+                      : isListening
+                      ? "text-teal-400"
+                      : "text-slate-400"
+                  }`}
+                >
+                  {error
+                    ? "Error"
+                    : isRecording
+                    ? "Grabando"
+                    : isProcessing
+                    ? "Procesando"
+                    : isPlayingAudio
+                    ? "Hablando"
+                    : isListening
+                    ? "Escuchando"
+                    : "Inactivo"}
+                </div>
+
+                {/* Subtexto más compacto */}
+                {isListening &&
+                  !isRecording &&
+                  !isProcessing &&
+                  !isPlayingAudio && (
+                    <div className="text-xs text-teal-300/60">
+                      Di "Hey Sofia"
+                    </div>
+                  )}
+
+                {lastTranscript && !isRecording && !isProcessing && (
+                  <div
+                    className="text-xs text-slate-400 truncate max-w-[120px]"
+                    title={lastTranscript}
+                  >
+                    "{lastTranscript}"
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Botón de configuración opcional */}
+            <button className="w-7 h-7 rounded-lg bg-slate-600/20 border border-slate-500/30 flex items-center justify-center hover:bg-slate-500/20 transition-colors opacity-70 hover:opacity-100">
+              <Settings className="w-3 h-3 text-slate-400" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Línea inferior decorativa */}
-      <div className="h-px bg-gradient-to-r from-transparent via-teal-400/30 to-transparent"></div>
+      {/* Línea inferior sutil */}
+      <div className="h-px bg-gradient-to-r from-transparent via-teal-400/20 to-transparent" />
     </div>
   );
 }

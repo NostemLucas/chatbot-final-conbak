@@ -1,17 +1,19 @@
 "use client";
-import { useState } from 'react';
-import { List } from 'lucide-react';
-import AgentAvatar from '@/components/AgentAvatar';
-import ChatInput from '@/components/ChatInput';
-import ResponseDisplay from '@/components/ResponseDisplay';
-import TopicsModal from '@/components/TopicsModal';
-import TopicsSlider from '@/components/TopicSlider';
-import { sendTextMessage, sendAudioMessage } from '@/lib/api';
-import { yastaTopics } from '@/data/topics';
-import { Topic } from '@/types';
+import { useState } from "react";
+import { List } from "lucide-react";
+import AgentAvatar from "@/components/AgentAvatar";
+import ChatInput from "@/components/ChatInput";
+import ResponseDisplay from "@/components/ResponseDisplay";
+import TopicsModal from "@/components/TopicsModal";
+import TopicsSlider from "@/components/TopicSlider";
+import { sendTextMessage, sendAudioMessage } from "@/lib/api";
+import { yastaTopics } from "@/data/topics";
+import { Topic } from "@/types";
 
 export default function SofiaApp() {
-  const [message, setMessage] = useState("¡Hola! Soy Sof-IA, tu asistente virtual de Yasta. ¿En qué puedo ayudarte hoy?");
+  const [message, setMessage] = useState(
+    "¡Hola! Soy Sof-IA, tu asistente virtual de Yasta. ¿En qué puedo ayudarte hoy?"
+  );
   const [isProcessing, setIsProcessing] = useState(false);
   const [isTopicsOpen, setIsTopicsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -19,10 +21,13 @@ export default function SofiaApp() {
   const handleTextMessage = async (userMessage: string) => {
     setIsProcessing(true);
     setIsAnimating(true);
-    
+
     try {
       const response = await sendTextMessage(userMessage);
-      setMessage(response.dialogflow.fulfillmentText || "Lo siento, no pude procesar tu mensaje.");
+      setMessage(
+        response.dialogflow.fulfillmentText ||
+          "Lo siento, no pude procesar tu mensaje."
+      );
     } catch (error) {
       setMessage("Error al procesar tu mensaje. Intenta de nuevo.");
     } finally {
@@ -34,10 +39,13 @@ export default function SofiaApp() {
   const handleAudioMessage = async (audioBlob: Blob) => {
     setIsProcessing(true);
     setIsAnimating(true);
-    
+
     try {
       const response = await sendAudioMessage(audioBlob);
-      setMessage(response.transcript || "Lo siento, no pude procesar tu audio.");
+      setMessage(
+        response.dialogflow.fulfillmentText ||
+          "Lo siento, no pude procesar tu audio."
+      );
     } catch (error) {
       setMessage("Error al procesar tu audio. Intenta de nuevo.");
     } finally {
@@ -53,26 +61,23 @@ export default function SofiaApp() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 p-4">
       <div className="max-w-4xl mx-auto">
-        <AgentAvatar isAnimating={isAnimating} imageUrl={"/avatar/smile.png"}/>
-        
-        <ResponseDisplay 
-          message={message} 
+        <AgentAvatar isAnimating={isAnimating} imageUrl={"/avatar/smile.png"} />
+
+        <ResponseDisplay
+          message={message}
           isProcessing={isProcessing}
           autoSpeak={!isProcessing}
         />
-        
+
         {/* Slider de temas */}
-        <TopicsSlider 
-          topics={yastaTopics}
-          onTopicSelect={handleTopicSelect}
-        />
-        
+        <TopicsSlider topics={yastaTopics} onTopicSelect={handleTopicSelect} />
+
         <ChatInput
           onSendMessage={handleTextMessage}
           onAudioRecorded={handleAudioMessage}
           disabled={isProcessing}
         />
-        
+
         <div className="text-center mt-6">
           <button
             onClick={() => setIsTopicsOpen(true)}

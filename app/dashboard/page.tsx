@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Bot,
   Volume2,
+  VolumeX,
   Smartphone,
   CreditCard,
   Banknote,
@@ -34,8 +35,124 @@ export default function YastaLearningCards() {
   const [sofiaMessage, setSofiaMessage] = useState(
     "¡Perfecto! Ahora elige cualquiera de estos temas para aprender todo sobre Yasta. Cada tema incluye videos explicativos y guías paso a paso."
   );
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
 
+  const synthRef = useRef<SpeechSynthesis | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const router = useRouter();
+
+  // Función para hablar el texto
+  const speakText = (text: string) => {
+    if (!synthRef.current || !speechSupported) {
+      console.log("Text-to-Speech no soportado en este navegador");
+      return;
+    }
+
+    // Cancelar cualquier síntesis anterior
+    synthRef.current.cancel();
+
+    setTimeout(() => {
+      if (!synthRef.current) return;
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utteranceRef.current = utterance;
+
+      // Configurar la voz (buscar una voz en español)
+      const voices = synthRef.current.getVoices();
+      const spanishVoice = voices.find(
+        (voice) =>
+          voice.lang.includes("es") ||
+          voice.name.toLowerCase().includes("spanish")
+      );
+
+      if (spanishVoice) {
+        utterance.voice = spanishVoice;
+      }
+
+      // Configurar parámetros de la voz
+      utterance.rate = 0.9;
+      utterance.pitch = 1.1;
+      utterance.volume = 0.8;
+
+      // Event listeners
+      utterance.onstart = () => {
+        setIsSpeaking(true);
+        executeAnimation("heartbeat");
+      };
+
+      utterance.onend = () => {
+        setIsSpeaking(false);
+      };
+
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+      };
+
+      synthRef.current.speak(utterance);
+    }, 100);
+  };
+
+  // Función para detener el habla
+  const stopSpeaking = () => {
+    if (synthRef.current) {
+      synthRef.current.cancel();
+      setIsSpeaking(false);
+    }
+  };
+
+  // Función para alternar entre hablar y parar
+  const toggleSpeech = () => {
+    if (isSpeaking) {
+      stopSpeaking();
+    } else {
+      speakText(sofiaMessage);
+    }
+  };
+
+  // Verificar soporte de Speech Synthesis al montar el componente
+  useEffect(() => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      synthRef.current = window.speechSynthesis;
+      setSpeechSupported(true);
+    }
+  }, []);
+
+  // Reproducir mensaje automáticamente al cargar (solo una vez)
+  useEffect(() => {
+    if (speechSupported && synthRef.current) {
+      const timer = setTimeout(() => {
+        if (synthRef.current && synthRef.current.getVoices().length > 0) {
+          speakText(sofiaMessage);
+        } else {
+          // Esperar a que las voces estén disponibles
+          const handleVoicesChanged = () => {
+            speakText(sofiaMessage);
+            if (synthRef.current) {
+              synthRef.current.onvoiceschanged = null;
+            }
+          };
+
+          if (synthRef.current) {
+            synthRef.current.onvoiceschanged = handleVoicesChanged;
+          }
+        }
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [speechSupported]);
+
+  // Reproducir solo cuando el mensaje cambie por progreso (no al cargar inicial)
+  useEffect(() => {
+    if (speechSupported && completedTopics.length > 0) {
+      const timer = setTimeout(() => {
+        speakText(sofiaMessage);
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [completedTopics.length, speechSupported]);
 
   // Función para marcar un tema como completado
   const markTopicAsCompleted = (topicId: number) => {
@@ -62,11 +179,9 @@ export default function YastaLearningCards() {
     });
   };
 
-  // Animaciones automáticas de respiración cada 10 segundos
   useEffect(() => {
     const interval = setInterval(() => {
       if (!selectedTopic) {
-        // Solo animar cuando no hay modal abierto
         executeAnimation("bounce");
       }
     }, 10000);
@@ -74,24 +189,20 @@ export default function YastaLearningCards() {
     return () => clearInterval(interval);
   }, [selectedTopic]);
 
-  // Animación según el progreso
   useEffect(() => {
     const progress = completedTopics.length / 7;
 
     if (progress === 1) {
-      // Completó todo - celebración
       executeAnimation("celebrate");
       setSofiaMessage(
         "¡🎉 INCREÍBLE! Has completado todos los temas de Yasta. Ahora eres un experto en billeteras móviles. ¡Ve a jugar y ganar premios!"
       );
     } else if (progress >= 0.5) {
-      // Más del 50% - brillo
       executeAnimation("glow");
       setSofiaMessage(
         "¡Excelente progreso! Ya dominas más de la mitad de los temas. ¡Sigue así para convertirte en un experto!"
       );
     } else if (completedTopics.length > 0) {
-      // Progreso inicial - latido suave
       executeAnimation("heartbeat");
       setSofiaMessage(
         `¡Muy bien! Has completado ${completedTopics.length} tema${
@@ -101,7 +212,6 @@ export default function YastaLearningCards() {
     }
   }, [completedTopics.length]);
 
-  // 🔧 FUNCIÓN CORREGIDA: findByResponse ahora marca como completado automáticamente
   const findByResponse = (intent: string) => {
     const topic = yastaTopics.find((topic) => topic.intent === intent);
     if (topic) {
@@ -112,29 +222,22 @@ export default function YastaLearningCards() {
         topic.title
       );
 
-      // ✅ MARCAR COMO COMPLETADO INMEDIATAMENTE cuando viene del reconocimiento de voz
       markTopicAsCompleted(topic.id);
-
-      // Abrir el modal del tema
-      handleTopicClick(topic, true); // true indica que viene de reconocimiento de voz
+      handleTopicClick(topic, true);
     } else {
       console.log("❌ No se encontró tema para el intent:", intent);
     }
   };
 
-  // 🔧 FUNCIÓN ACTUALIZADA: handleTopicClick ahora recibe parámetro para saber el origen
   const handleTopicClick = (topic: Topic, fromVoice: boolean = false) => {
     setSelectedTopic(topic);
 
     executeAnimation("flip");
 
-    // Solo marcar como completado si NO viene del reconocimiento de voz
-    // (porque ya se marcó en findByResponse)
     if (!fromVoice) {
       markTopicAsCompleted(topic.id);
     }
 
-    // Mensaje personalizado según el origen
     if (fromVoice) {
       setSofiaMessage(
         `¡Perfecto! Reconocí tu voz y te mostré "${topic.title}". Este tema ya está completado. ¿Quieres aprender sobre otro tema?`
@@ -147,7 +250,7 @@ export default function YastaLearningCards() {
   };
 
   const goToGames = () => {
-    executeAnimation("celebrate"); // Celebrar antes de ir a juegos
+    executeAnimation("celebrate");
     setSofiaMessage(
       "¡Fue un placer enseñarte sobre Yasta! Ahora te invito a la siguiente pantalla para ganar premios jugando."
     );
@@ -183,6 +286,15 @@ export default function YastaLearningCards() {
     );
     executeAnimation("flip");
   };
+
+  // Limpiar síntesis de voz al desmontar el componente
+  useEffect(() => {
+    return () => {
+      if (synthRef.current) {
+        synthRef.current.cancel();
+      }
+    };
+  }, []);
 
   const frontImage = "avatar/smile.png";
 
@@ -281,9 +393,34 @@ export default function YastaLearningCards() {
         <div className="bg-slate-800/50 backdrop-blur-xl border-2 border-teal-500/40 shadow-2xl rounded-xl sm:rounded-3xl">
           <div className="p-3 sm:p-6 lg:p-10 text-center">
             <div className="flex items-center justify-center mb-3 sm:mb-6">
-              <Volume2 className="w-4 h-4 sm:w-8 sm:h-8 text-teal-400 mr-2 sm:mr-4 animate-pulse" />
+              <button
+                onClick={toggleSpeech}
+                className={`mr-2 sm:mr-4 p-2 rounded-full transition-all duration-300 hover:scale-110 ${
+                  isSpeaking
+                    ? "bg-red-500/20 border border-red-400/50"
+                    : "bg-teal-500/20 border border-teal-400/50"
+                } ${
+                  !speechSupported
+                    ? "opacity-50 cursor-not-allowed"
+                    : "cursor-pointer"
+                }`}
+                disabled={!speechSupported}
+                title={
+                  !speechSupported
+                    ? "Text-to-Speech no soportado"
+                    : isSpeaking
+                    ? "Detener audio"
+                    : "Reproducir audio"
+                }
+              >
+                {isSpeaking ? (
+                  <VolumeX className="w-4 h-4 sm:w-6 sm:h-6 text-red-300 animate-pulse" />
+                ) : (
+                  <Volume2 className="w-4 h-4 sm:w-6 sm:h-6 text-teal-400 animate-pulse" />
+                )}
+              </button>
               <span className="text-base sm:text-2xl lg:text-3xl text-teal-300 font-bold">
-                Sof-IA:
+                {isSpeaking ? "Sof-IA está hablando:" : "Sof-IA:"}
               </span>
             </div>
             <p className="text-xs sm:text-xl lg:text-2xl xl:text-3xl text-pretty font-medium text-teal-100 leading-relaxed max-w-4xl mx-auto">

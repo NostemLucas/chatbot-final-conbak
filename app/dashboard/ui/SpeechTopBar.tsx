@@ -1,15 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import {
-  Mic,
-  MicOff,
-  Volume2,
-  Radio,
-  Sparkles,
-  Settings,
-  X,
-  Send,
-  Loader2,
-} from "lucide-react";
+import { Mic, Radio, Sparkles, Settings, X, Send, Loader2 } from "lucide-react";
 
 // Interfaces existentes
 interface DialogflowResponse {
@@ -99,7 +89,7 @@ function AudioWaves({ isActive }: { isActive: boolean }) {
   );
 }
 
-// Componente Modal
+// Componente Modal simplificado
 interface VoiceModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -118,7 +108,6 @@ function VoiceModal({
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [textInput, setTextInput] = useState("");
-  const [mode, setMode] = useState<"voice" | "text">("voice");
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -129,7 +118,6 @@ function VoiceModal({
       stopRecording();
       setTextInput("");
       setRecordingTime(0);
-      setMode("voice");
     }
   }, [isOpen]);
 
@@ -173,7 +161,6 @@ function VoiceModal({
       setIsRecording(true);
       setRecordingTime(0);
 
-      // Contador de tiempo
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTime((prev) => prev + 1);
       }, 1000);
@@ -243,128 +230,96 @@ function VoiceModal({
           </button>
         </div>
 
-        {/* Toggle Mode */}
-        <div className="p-6 border-b border-slate-700/30">
-          <div className="flex bg-slate-800/50 rounded-lg p-1">
-            <button
-              onClick={() => setMode("voice")}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                mode === "voice"
-                  ? "bg-teal-500/20 text-teal-300 border border-teal-500/30"
-                  : "text-slate-400 hover:text-slate-300"
-              }`}
-            >
-              <Mic className="w-4 h-4 inline mr-2" />
-              Voz
-            </button>
-            <button
-              onClick={() => setMode("text")}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                mode === "text"
-                  ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                  : "text-slate-400 hover:text-slate-300"
-              }`}
-            >
-              <Send className="w-4 h-4 inline mr-2" />
-              Texto
-            </button>
-          </div>
-        </div>
-
         {/* Content */}
         <div className="p-6">
-          {mode === "voice" ? (
-            // Modo Voz
-            <div className="text-center">
-              <div className="mb-6">
-                <div
-                  className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center transition-all ${
-                    isRecording
-                      ? "bg-red-500/20 border-2 border-red-400 animate-pulse"
-                      : "bg-teal-500/20 border-2 border-teal-400"
-                  }`}
-                >
-                  {isProcessing ? (
-                    <Loader2 className="w-8 h-8 text-teal-400 animate-spin" />
-                  ) : (
-                    <Mic
-                      className={`w-8 h-8 ${
-                        isRecording ? "text-red-400" : "text-teal-400"
-                      }`}
-                    />
-                  )}
-                </div>
-
-                {isRecording && (
-                  <div className="mt-4 text-red-400 font-mono text-lg">
-                    {formatTime(recordingTime)}
-                  </div>
+          {/* Sección de grabación */}
+          <div className="text-center mb-6">
+            <div className="mb-4">
+              <div
+                className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center transition-all ${
+                  isRecording
+                    ? "bg-red-500/20 border-2 border-red-400 animate-pulse"
+                    : "bg-teal-500/20 border-2 border-teal-400"
+                }`}
+              >
+                {isProcessing ? (
+                  <Loader2 className="w-8 h-8 text-teal-400 animate-spin" />
+                ) : (
+                  <Mic
+                    className={`w-8 h-8 ${
+                      isRecording ? "text-red-400" : "text-teal-400"
+                    }`}
+                  />
                 )}
               </div>
 
-              <div className="space-y-4">
-                <p className="text-slate-300 text-sm">
-                  {isRecording
-                    ? "Grabando... Habla ahora"
-                    : isProcessing
-                    ? "Procesando tu mensaje..."
-                    : "Presiona para grabar tu mensaje"}
-                </p>
-
-                <button
-                  onClick={isRecording ? stopRecording : startRecording}
-                  disabled={isProcessing}
-                  className={`w-full py-3 px-6 rounded-lg font-medium transition-all ${
-                    isRecording
-                      ? "bg-red-500/20 border border-red-400/50 text-red-300 hover:bg-red-500/30"
-                      : "bg-teal-500/20 border border-teal-400/50 text-teal-300 hover:bg-teal-500/30"
-                  } disabled:opacity-50`}
-                >
-                  {isRecording ? "Detener Grabación" : "Grabar Mensaje"}
-                </button>
-              </div>
+              {isRecording && (
+                <div className="mt-4 text-red-400 font-mono text-lg">
+                  {formatTime(recordingTime)}
+                </div>
+              )}
             </div>
-          ) : (
-            // Modo Texto
-            <div className="space-y-4">
-              <textarea
-                value={textInput}
-                onChange={(e) => setTextInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Escribe tu mensaje aquí..."
-                disabled={isProcessing}
-                className="w-full h-32 bg-slate-800/50 border border-slate-600/50 rounded-lg p-3 text-white placeholder-slate-400 resize-none focus:outline-none focus:border-blue-400/50 focus:ring-1 focus:ring-blue-400/20"
-                maxLength={500}
-              />
 
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-slate-400">
-                  {textInput.length}/500 caracteres
-                </span>
+            <button
+              onClick={isRecording ? stopRecording : startRecording}
+              disabled={isProcessing}
+              className={`w-full py-3 px-6 rounded-lg font-medium transition-all mb-4 ${
+                isRecording
+                  ? "bg-red-500/20 border border-red-400/50 text-red-300 hover:bg-red-500/30"
+                  : "bg-teal-500/20 border border-teal-400/50 text-teal-300 hover:bg-teal-500/30"
+              } disabled:opacity-50`}
+            >
+              {isRecording ? "Detener Grabación" : "Grabar Mensaje"}
+            </button>
+          </div>
 
-                <button
-                  onClick={handleSendText}
-                  disabled={!textInput.trim() || isProcessing}
-                  className="flex items-center gap-2 py-2 px-4 bg-blue-500/20 border border-blue-400/50 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-all disabled:opacity-50"
-                >
-                  {isProcessing ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Send className="w-4 h-4" />
-                  )}
-                  Enviar
-                </button>
-              </div>
+          {/* Separador */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex-1 h-px bg-slate-600/50"></div>
+            <span className="text-sm text-slate-400">o escribe</span>
+            <div className="flex-1 h-px bg-slate-600/50"></div>
+          </div>
+
+          {/* Sección de texto */}
+          <div className="space-y-4">
+            <input
+              type="text"
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Escribe tu mensaje..."
+              disabled={isProcessing || isRecording}
+              className="w-full bg-slate-800/50 border border-slate-600/50 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-blue-400/50 focus:ring-1 focus:ring-blue-400/20"
+              maxLength={200}
+            />
+
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-slate-400">
+                {textInput.length}/200
+              </span>
+
+              <button
+                onClick={handleSendText}
+                disabled={!textInput.trim() || isProcessing || isRecording}
+                className="flex items-center gap-2 py-2 px-4 bg-blue-500/20 border border-blue-400/50 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-all disabled:opacity-50"
+              >
+                {isProcessing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+                Enviar
+              </button>
             </div>
-          )}
+          </div>
         </div>
 
         {/* Footer */}
         <div className="px-6 py-4 bg-slate-800/30 rounded-b-2xl">
           <p className="text-xs text-slate-400 text-center">
-            {mode === "voice"
-              ? "Tu audio será procesado y enviado automáticamente"
-              : "Presiona Enter para enviar o usa el botón Enviar"}
+            {isProcessing
+              ? "Procesando tu mensaje..."
+              : "Graba tu voz o escribe tu mensaje"}
           </p>
         </div>
       </div>
@@ -396,48 +351,32 @@ export default function VoiceTopBar({
   onStateChange,
   handleResponse,
   onListeningToggle,
-  onRecordingStart,
-  onRecordingStop,
   className = "",
 }: VoiceTopBarProps) {
-  // Estados internos
+  // Estados internos simplificados
   const [internalIsListening, setInternalIsListening] =
-    useState<boolean>(false);
-  const [internalIsRecording, setInternalIsRecording] =
     useState<boolean>(false);
   const [internalIsProcessing, setInternalIsProcessing] =
     useState<boolean>(false);
   const [internalIsSpeaking, setInternalIsSpeaking] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
-  // Estados actuales
-  const isListening = parentIsListening ?? internalIsListening;
-  const isRecording = parentIsRecording ?? internalIsRecording;
-  const isProcessing = parentIsProcessing ?? internalIsProcessing;
-  const isPlayingAudio = parentIsSpeaking ?? internalIsSpeaking;
-
-  const [timeLeft, setTimeLeft] = useState<number>(5);
   const [error, setError] = useState<string>("");
   const [lastTranscript, setLastTranscript] = useState<string>("");
   const [lastIntent, setLastIntent] = useState<string>("");
 
+  // Estados actuales
+  const isListening = parentIsListening ?? internalIsListening;
+  const isRecording = parentIsRecording ?? false;
+  const isProcessing = parentIsProcessing ?? internalIsProcessing;
+  const isPlayingAudio = parentIsSpeaking ?? internalIsSpeaking;
+
   // Referencias
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const recordingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const restartListeningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isRecognitionActive = useRef<boolean>(false);
+  const restartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isModalWasOpen = useRef<boolean>(false);
 
-  const wakeWords: string[] = [
-    "sofia",
-    "sofía",
-    "hey sofia",
-    "oye sofia",
-    "hola sofia",
-  ];
-
-  const progress = ((5 - timeLeft) / 5) * 100;
+  const wakeWords: string[] = ["sofia", "sofía", "hey sofia", "oye sofia"];
 
   const getCurrentState = (): VoiceState => {
     if (isRecording) return "recording";
@@ -454,7 +393,6 @@ export default function VoiceTopBar({
       isRecording,
       isProcessing,
       isSpeaking: isPlayingAudio,
-      recordingTimeLeft: isRecording ? timeLeft : undefined,
       lastTranscript: lastTranscript || undefined,
       lastIntent: lastIntent || undefined,
       error: error || undefined,
@@ -469,153 +407,157 @@ export default function VoiceTopBar({
     isProcessing,
     isPlayingAudio,
     isListening,
-    timeLeft,
     error,
     lastTranscript,
     lastIntent,
   ]);
 
+  // Inicializar reconocimiento al montar
   useEffect(() => {
     if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
       initializeContinuousListening();
     }
 
     return () => {
-      cleanupRecognition();
-      cleanupTimers();
+      cleanupAll();
     };
   }, []);
 
-  const cleanupRecognition = (): void => {
+  // Manejo del modal
+  useEffect(() => {
+    if (isModalOpen) {
+      isModalWasOpen.current = true;
+      stopListening();
+    } else if (isModalWasOpen.current) {
+      isModalWasOpen.current = false;
+      // Reiniciar después de cerrar el modal
+      restartTimeoutRef.current = setTimeout(() => {
+        if (!isProcessing && !isPlayingAudio) {
+          initializeContinuousListening();
+        }
+      }, 1000);
+    }
+  }, [isModalOpen]);
+
+  const cleanupAll = (): void => {
+    stopListening();
+    if (restartTimeoutRef.current) {
+      clearTimeout(restartTimeoutRef.current);
+      restartTimeoutRef.current = null;
+    }
+  };
+
+  const stopListening = (): void => {
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
       } catch (e) {
-        console.log("Recognition already stopped");
+        console.log("Recognition stop error:", e);
       }
       recognitionRef.current = null;
     }
-  };
-
-  const cleanupTimers = (): void => {
-    if (recordingTimeoutRef.current) {
-      clearTimeout(recordingTimeoutRef.current);
-      recordingTimeoutRef.current = null;
-    }
-    if (countdownIntervalRef.current) {
-      clearInterval(countdownIntervalRef.current);
-      countdownIntervalRef.current = null;
-    }
-    if (restartListeningTimeoutRef.current) {
-      clearTimeout(restartListeningTimeoutRef.current);
-      restartListeningTimeoutRef.current = null;
-    }
+    isRecognitionActive.current = false;
+    setInternalIsListening(false);
   };
 
   const initializeContinuousListening = (): void => {
-    cleanupRecognition();
+    // No inicializar si hay condiciones que lo impidan
+    if (
+      isModalOpen ||
+      isProcessing ||
+      isPlayingAudio ||
+      isRecognitionActive.current
+    ) {
+      return;
+    }
 
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
 
+    if (!SpeechRecognition) {
+      console.warn("SpeechRecognition not supported");
+      return;
+    }
+
+    // Limpiar reconocimiento anterior
+    stopListening();
+
+    const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = "es-ES";
 
     recognition.onstart = () => {
+      console.log("✅ Recognition started");
       setInternalIsListening(true);
       setError("");
+      isRecognitionActive.current = true;
     };
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let finalTranscript = "";
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript.toLowerCase().trim();
-
         if (event.results[i].isFinal) {
-          finalTranscript += transcript + " ";
+          finalTranscript += event.results[i][0].transcript
+            .toLowerCase()
+            .trim();
         }
       }
 
       if (finalTranscript) {
-        setLastTranscript(finalTranscript.trim());
+        console.log("📝 Final transcript:", finalTranscript);
+        setLastTranscript(finalTranscript);
 
         const hasWakeWord = wakeWords.some((word) =>
           finalTranscript.includes(word.toLowerCase())
         );
 
-        if (
-          hasWakeWord &&
-          !isRecording &&
-          !isProcessing &&
-          !isPlayingAudio &&
-          !isModalOpen
-        ) {
-          // Abrir modal en lugar de grabar directamente
+        if (hasWakeWord && !isModalOpen && !isProcessing && !isPlayingAudio) {
+          console.log("🎯 Wake word detected, opening modal");
           setIsModalOpen(true);
-          stopContinuousListening();
         }
       }
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      if (!["no-speech", "aborted", "network"].includes(event.error)) {
+      console.log("❌ Recognition error:", event.error);
+
+      if (!["no-speech", "aborted"].includes(event.error)) {
         setError(`Error: ${event.error}`);
       }
 
-      if (!isRecording && !isProcessing && !isPlayingAudio && !isModalOpen) {
-        setTimeout(() => {
-          startContinuousListening();
-        }, 1000);
-      }
+      isRecognitionActive.current = false;
+      setInternalIsListening(false);
     };
 
     recognition.onend = () => {
+      console.log("🔚 Recognition ended");
+      isRecognitionActive.current = false;
       setInternalIsListening(false);
 
-      if (!isRecording && !isProcessing && !isPlayingAudio && !isModalOpen) {
-        setTimeout(() => {
-          startContinuousListening();
-        }, 500);
+      // Solo reiniciar si no estamos en modal o procesando
+      if (!isModalOpen && !isProcessing && !isPlayingAudio) {
+        restartTimeoutRef.current = setTimeout(() => {
+          initializeContinuousListening();
+        }, 2000);
       }
     };
 
     recognitionRef.current = recognition;
-  };
 
-  const startContinuousListening = (): void => {
-    if (isRecording || isProcessing || isPlayingAudio || isModalOpen) {
-      return;
-    }
-
-    if (recognitionRef.current && !isListening) {
-      try {
-        recognitionRef.current.start();
-      } catch (err) {
-        setTimeout(() => {
-          initializeContinuousListening();
-        }, 1000);
-      }
+    try {
+      recognition.start();
+    } catch (err) {
+      console.error("Error starting recognition:", err);
+      isRecognitionActive.current = false;
+      setInternalIsListening(false);
     }
   };
 
-  const stopContinuousListening = (): void => {
-    if (recognitionRef.current && isListening) {
-      try {
-        recognitionRef.current.stop();
-      } catch (e) {
-        console.log("Recognition already stopping");
-      }
-    }
-  };
-
-  // Función para manejar audio del modal
   const handleModalAudioSend = async (audioBlob: Blob): Promise<void> => {
     try {
       setInternalIsProcessing(true);
-
       const formData = new FormData();
       formData.append("audio", audioBlob, "audio.webm");
 
@@ -645,23 +587,17 @@ export default function VoiceTopBar({
       }
 
       setIsModalOpen(false);
-
-      setTimeout(() => {
-        restartListening();
-      }, 100);
     } catch (err) {
+      console.error("Error processing audio:", err);
       setError("Error procesando audio");
+    } finally {
       setInternalIsProcessing(false);
-      setIsModalOpen(false);
-      restartListening();
     }
   };
 
-  // Función para manejar texto del modal
   const handleModalTextSend = async (text: string): Promise<void> => {
     try {
       setInternalIsProcessing(true);
-
       const response = await fetch("/api/text-to-intent", {
         method: "POST",
         headers: {
@@ -674,28 +610,27 @@ export default function VoiceTopBar({
         throw new Error(`Error: ${response.status}`);
       }
 
-      const data: DialogflowResponse = await response.json();
+      const data: TranscriptionResult = await response.json();
 
       setInternalIsProcessing(false);
-      setLastIntent(data.intent);
+      setLastIntent(data.dialogflow.intent);
 
-      onIntentDetected?.(data.intent, data.fulfillmentText);
-      handleResponse(data.intent);
+      onIntentDetected?.(
+        data.dialogflow.intent,
+        data.dialogflow.fulfillmentText
+      );
+      handleResponse(data.dialogflow.intent);
 
-      if (data.fulfillmentText) {
-        await speakResponse(data.fulfillmentText);
+      if (data.dialogflow.fulfillmentText) {
+        await speakResponse(data.dialogflow.fulfillmentText);
       }
 
       setIsModalOpen(false);
-
-      setTimeout(() => {
-        restartListening();
-      }, 100);
     } catch (err) {
+      console.error("Error processing text:", err);
       setError("Error procesando texto");
+    } finally {
       setInternalIsProcessing(false);
-      setIsModalOpen(false);
-      restartListening();
     }
   };
 
@@ -711,58 +646,22 @@ export default function VoiceTopBar({
 
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "es-ES";
-      utterance.rate = 1;
+      utterance.rate = 0.9;
       utterance.pitch = 1;
-      utterance.volume = 1;
+      utterance.volume = 0.8;
 
-      const setVoiceAndSpeak = () => {
-        const voices = window.speechSynthesis.getVoices();
-        const spanishVoice =
-          voices.find(
-            (v) =>
-              v.lang.startsWith("es") && v.name.toLowerCase().includes("female")
-          ) || voices.find((v) => v.lang.startsWith("es"));
-
-        if (spanishVoice) {
-          utterance.voice = spanishVoice;
-        }
-
-        utterance.onend = () => {
-          setInternalIsSpeaking(false);
-          resolve();
-        };
-
-        utterance.onerror = () => {
-          setInternalIsSpeaking(false);
-          resolve();
-        };
-
-        window.speechSynthesis.speak(utterance);
+      utterance.onend = () => {
+        setInternalIsSpeaking(false);
+        resolve();
       };
 
-      if (window.speechSynthesis.getVoices().length === 0) {
-        window.speechSynthesis.onvoiceschanged = setVoiceAndSpeak;
-      } else {
-        setVoiceAndSpeak();
-      }
+      utterance.onerror = () => {
+        setInternalIsSpeaking(false);
+        resolve();
+      };
+
+      window.speechSynthesis.speak(utterance);
     });
-  };
-
-  const restartListening = (): void => {
-    cleanupTimers();
-
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
-
-    setInternalIsRecording(false);
-    setInternalIsProcessing(false);
-    setInternalIsSpeaking(false);
-    setTimeLeft(5);
-
-    restartListeningTimeoutRef.current = setTimeout(() => {
-      initializeContinuousListening();
-    }, 500);
   };
 
   const toggleListening = (): void => {
@@ -770,18 +669,11 @@ export default function VoiceTopBar({
       onListeningToggle();
     } else {
       if (isListening) {
-        stopContinuousListening();
+        stopListening();
       } else {
-        startContinuousListening();
+        initializeContinuousListening();
       }
     }
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setTimeout(() => {
-      restartListening();
-    }, 500);
   };
 
   return (
@@ -791,19 +683,21 @@ export default function VoiceTopBar({
       >
         <div className="h-px bg-gradient-to-r from-transparent via-teal-400/30 to-transparent" />
 
-        <div className="max-w-6xl mx-auto px-4 py-2.5">
+        <div className="max-w-6xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-6">
-            {/* Logo compacto */}
+            {/* Logo */}
             <div className="flex items-center gap-3 flex-shrink-0">
               <div className="relative">
-                <div className="w-7 h-7 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg">
-                  <Sparkles className="w-3.5 h-3.5 text-white" />
+                <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg">
+                  <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <div className="absolute inset-0 bg-teal-400/20 rounded-lg blur-sm animate-pulse" />
+                {(isListening || isRecognitionActive.current) && (
+                  <div className="absolute inset-0 bg-teal-400/20 rounded-lg blur-sm animate-pulse" />
+                )}
               </div>
 
               <div>
-                <h1 className="text-lg font-bold bg-gradient-to-r from-teal-200 to-cyan-300 bg-clip-text text-transparent">
+                <h1 className="text-xl font-bold bg-gradient-to-r from-teal-200 to-cyan-300 bg-clip-text text-transparent">
                   Sof-IA
                 </h1>
                 <p className="text-xs text-slate-400 leading-none">
@@ -812,13 +706,12 @@ export default function VoiceTopBar({
               </div>
             </div>
 
-            {/* Controles de voz centrales */}
+            {/* Controles centrales */}
             <div className="flex items-center gap-4">
-              {/* Botón de escucha */}
               <button
                 onClick={toggleListening}
                 disabled={isRecording || isProcessing || isPlayingAudio}
-                className={`relative w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 transform hover:scale-105 disabled:opacity-50 border ${
+                className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105 disabled:opacity-50 border ${
                   isListening
                     ? "bg-teal-500/20 border-teal-400/50 shadow-lg shadow-teal-400/20"
                     : "bg-slate-600/20 border-slate-500/30 hover:bg-slate-500/20"
@@ -826,12 +719,10 @@ export default function VoiceTopBar({
                 title={isListening ? "Desactivar escucha" : "Activar escucha"}
               >
                 <Radio
-                  className={`w-3.5 h-3.5 ${
+                  className={`w-4 h-4 ${
                     isListening ? "text-teal-300" : "text-slate-400"
                   }`}
                 />
-
-                {/* Ondas de audio */}
                 <AudioWaves
                   isActive={
                     isListening &&
@@ -840,34 +731,31 @@ export default function VoiceTopBar({
                     !isPlayingAudio
                   }
                 />
-
-                {/* Indicador live */}
                 {isListening &&
                   !isRecording &&
                   !isProcessing &&
                   !isPlayingAudio && (
-                    <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-400 rounded-full animate-ping" />
+                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-ping" />
                   )}
               </button>
 
-              {/* Botón para abrir modal */}
               <button
                 onClick={() => setIsModalOpen(true)}
                 disabled={isProcessing || isPlayingAudio}
-                className="relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105 disabled:opacity-50 border-2 bg-teal-500/20 border-teal-400/60 shadow-lg shadow-teal-400/20 hover:shadow-teal-400/30"
+                className="relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105 disabled:opacity-50 border-2 bg-gradient-to-br from-teal-500/20 to-cyan-500/20 border-teal-400/60 shadow-lg shadow-teal-400/20 hover:shadow-teal-400/30"
                 title="Abrir asistente"
               >
-                <Mic className="w-4 h-4 text-teal-300 relative z-10" />
+                <Mic className="w-5 h-5 text-teal-300" />
               </button>
             </div>
 
-            {/* Panel de estado compacto */}
+            {/* Estado */}
             <div className="flex items-center gap-3 min-w-0 flex-1 justify-end">
               <div className="flex items-center gap-2">
                 <div
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
                     error
-                      ? "bg-red-400"
+                      ? "bg-red-400 animate-pulse"
                       : isRecording
                       ? "bg-red-400 animate-pulse"
                       : isProcessing
@@ -909,43 +797,31 @@ export default function VoiceTopBar({
                       : "Inactivo"}
                   </div>
 
-                  {/* Subtexto */}
                   {isListening &&
                     !isRecording &&
                     !isProcessing &&
                     !isPlayingAudio && (
-                      <div className="text-xs text-teal-300/60">
-                        Di "Hey Sofia"
-                      </div>
+                      <div className="text-xs text-teal-300/60">Di "Sofia"</div>
                     )}
-
-                  {lastTranscript && !isRecording && !isProcessing && (
-                    <div
-                      className="text-xs text-slate-400 truncate max-w-[120px]"
-                      title={lastTranscript}
-                    >
-                      "{lastTranscript}"
-                    </div>
-                  )}
                 </div>
               </div>
 
-              {/* Botón de configuración */}
-              <button className="w-7 h-7 rounded-lg bg-slate-600/20 border border-slate-500/30 flex items-center justify-center hover:bg-slate-500/20 transition-colors opacity-70 hover:opacity-100">
+              <button
+                className="w-8 h-8 rounded-lg bg-slate-600/20 border border-slate-500/30 flex items-center justify-center hover:bg-slate-500/20 transition-colors opacity-70 hover:opacity-100"
+                title="Configuración"
+              >
                 <Settings className="w-3 h-3 text-slate-400" />
               </button>
             </div>
           </div>
         </div>
 
-        {/* Línea inferior */}
         <div className="h-px bg-gradient-to-r from-transparent via-teal-400/20 to-transparent" />
       </div>
 
-      {/* Modal de voz y texto */}
       <VoiceModal
         isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        onClose={() => setIsModalOpen(false)}
         onSendAudio={handleModalAudioSend}
         onSendText={handleModalTextSend}
         isProcessing={isProcessing}

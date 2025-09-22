@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Mic, Radio, Sparkles, Settings, X, Send, Loader2 } from "lucide-react";
 
-// Interfaces existentes
 interface DialogflowResponse {
   intent: string;
   fulfillmentText: string;
@@ -66,7 +65,6 @@ export interface VoiceStateData {
   error?: string;
 }
 
-// Componente de ondas de audio
 function AudioWaves({ isActive }: { isActive: boolean }) {
   if (!isActive) return null;
 
@@ -89,7 +87,6 @@ function AudioWaves({ isActive }: { isActive: boolean }) {
   );
 }
 
-// Componente Modal simplificado
 interface VoiceModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -327,7 +324,6 @@ function VoiceModal({
   );
 }
 
-// Componente principal
 interface VoiceTopBarProps {
   isListening?: boolean;
   isRecording?: boolean;

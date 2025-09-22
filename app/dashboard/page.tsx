@@ -16,6 +16,7 @@ import {
   Play,
   Sparkles,
   LucideIcon,
+  Mic,
 } from "lucide-react";
 import InteractiveCoin, {
   type AnimationCommand,
@@ -32,8 +33,9 @@ export default function YastaLearningCards() {
   const [completedTopics, setCompletedTopics] = useState<number[]>([]);
   const [animationCommand, setAnimationCommand] =
     useState<AnimationCommand | null>(null);
+
   const [sofiaMessage, setSofiaMessage] = useState(
-    "¡Perfecto! Ahora elige cualquiera de estos temas para aprender todo sobre Yasta. Cada tema incluye videos explicativos y guías paso a paso."
+    "!Hola¡ Soy Sof-IA, Estoy aqui para ayudarle a concoer y usar tu billetera movil de forma segura y sencilla. Preguntame lo que quieras: como enviar dinero, pagar servicio, recragr saldo o resolver dudas."
   );
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
@@ -308,29 +310,6 @@ export default function YastaLearningCards() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 p-4 sm:p-6 lg:p-8 relative overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-10 sm:top-20 left-10 sm:left-20 w-48 sm:w-96 h-48 sm:h-96 bg-gradient-to-r from-teal-400/30 to-cyan-600/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-10 sm:bottom-20 right-10 sm:right-20 w-72 sm:w-[600px] h-72 sm:h-[600px] bg-gradient-to-r from-cyan-400/30 to-teal-600/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 sm:w-72 h-48 sm:h-72 bg-gradient-to-r from-purple-400/20 to-pink-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-16 sm:top-32 right-16 sm:right-32 w-3 sm:w-4 h-3 sm:h-4 bg-teal-400 rounded-full animate-ping opacity-60"></div>
-        <div className="absolute bottom-16 sm:bottom-32 left-16 sm:left-32 w-4 sm:w-6 h-4 sm:h-6 bg-cyan-400 rounded-full animate-ping opacity-40"></div>
-        <div className="absolute top-32 sm:top-64 left-1/4 w-2 sm:w-3 h-2 sm:h-3 bg-purple-400 rounded-full animate-ping opacity-50"></div>
-      </div>
-
-      <VoiceTopBar handleResponse={findByResponse} />
-
-      {/* 🔧 BOTÓN DE DEBUG (solo visible en desarrollo) */}
-      {process.env.NODE_ENV === "development" && (
-        <div className="fixed top-4 right-4 z-50">
-          <button
-            onClick={resetProgress}
-            className="px-3 py-2 bg-red-500/80 text-white text-xs rounded-lg hover:bg-red-600/80"
-          >
-            Reset Progreso
-          </button>
-        </div>
-      )}
-
       <div className="text-center mb-6 sm:mb-12 lg:mb-16 relative z-10 mt-18">
         <div className="mb-3 sm:mb-6">
           <h1 className="text-2xl sm:text-5xl lg:text-6xl xl:text-8xl font-extrabold leading-tight bg-gradient-to-r from-teal-400 via-cyan-500 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_10px_10px_rgba(0,0,0,0.3)]">
@@ -430,37 +409,9 @@ export default function YastaLearningCards() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto mb-6 sm:mb-12 lg:mb-16 relative z-10">
-        <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl sm:rounded-3xl p-3 sm:p-6 lg:p-10 border-2 border-teal-500/40 shadow-2xl">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-8 space-y-2 sm:space-y-0">
-            <h2 className="text-base sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-teal-100 text-center sm:text-left">
-              Tu Progreso de Aprendizaje
-            </h2>
-            <div
-              className="text-xs sm:text-lg lg:text-xl xl:text-2xl px-3 sm:px-6 lg:px-8 py-1 sm:py-3 lg:py-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white border-0 rounded-lg sm:rounded-2xl font-bold shadow-lg text-center cursor-pointer hover:scale-105 transition-transform duration-300"
-              onClick={() => executeAnimation("showBack", "back", 3000)}
-            >
-              {completedTopics.length}/7 Temas Completados
-            </div>
-          </div>
-          <div className="w-full bg-slate-800 rounded-full h-3 sm:h-6 shadow-inner">
-            <div
-              className="bg-gradient-to-r from-teal-500 to-cyan-600 h-3 sm:h-6 rounded-full transition-all duration-1000 shadow-lg relative overflow-hidden"
-              style={{ width: `${(completedTopics.length / 7) * 100}%` }}
-            >
-              <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-            </div>
-          </div>
-          <div className="text-center mt-2 sm:mt-4">
-            <p className="text-xs sm:text-lg lg:text-xl text-slate-300">
-              {completedTopics.length === 7
-                ? "¡Felicitaciones! Has completado todo el aprendizaje 🎉"
-                : `Faltan ${
-                    7 - completedTopics.length
-                  } temas para completar tu educación financiera`}
-            </p>
-          </div>
-        </div>
+      <div className="max-w-6xl mx-auto border border-amber-50 rounded-2xl mb-6 sm:mb-12 lg:mb-16 relative z-10 flex items-center justify-center gap-4">
+        <Mic className="w-8 h-8 " />
+        <input type="text" />
       </div>
 
       <div className="max-w-7xl mx-auto mb-6 sm:mb-12 lg:mb-16 relative z-10">

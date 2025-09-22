@@ -1,5 +1,3 @@
-// lib/config/gcp-credentials.ts
-
 export interface GCPCredentials {
   type: string;
   project_id: string;
@@ -41,9 +39,6 @@ export class GCPCredentialsManager {
     return GCPCredentialsManager.instance;
   }
 
-  /**
-   * Obtiene las opciones del cliente GCP en orden de prioridad
-   */
   getClientOptions(): ClientOptions {
     // 1. Archivo de credenciales (más seguro para producción)
     if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
@@ -229,50 +224,4 @@ export class GCPCredentialsManager {
       return false;
     }
   }
-
-  /**
-   * Obtiene información sobre el origen de las credenciales
-   */
-  getCredentialsSource(): CredentialsSource | null {
-    if (!this.credentialsSource) {
-      this.getClientOptions(); // Esto establecerá el origen
-    }
-    return this.credentialsSource;
-  }
-
-  /**
-   * Limpia las credenciales cargadas (útil para testing)
-   */
-  clearCredentials(): void {
-    this.credentials = null;
-    this.credentialsSource = null;
-  }
-
-  /**
-   * Obtiene información de diagnóstico (sin exponer información sensible)
-   */
-  getDiagnosticInfo(): object {
-    const source = this.getCredentialsSource();
-    const projectId = this.getProjectId();
-    const hasCredentials = this.validateCredentials();
-
-    return {
-      source,
-      projectId,
-      hasCredentials,
-      clientEmail: this.credentials?.client_email
-        ? this.credentials.client_email.substring(0, 10) + "..."
-        : null,
-    };
-  }
-}
-
-// Función de utilidad para obtener una instancia configurada
-export function getGCPCredentials(): GCPCredentialsManager {
-  return GCPCredentialsManager.getInstance();
-}
-
-// Función de utilidad para validar el entorno
-export function validateGCPEnvironment(): boolean {
-  return getGCPCredentials().validateCredentials();
 }

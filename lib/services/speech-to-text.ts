@@ -37,10 +37,6 @@ export class SpeechToTextService {
         // Opcional: override del projectId si es necesario
         projectId: this.gcpManager.getProjectId(),
       });
-
-      console.log(
-        `Speech client inicializado con credenciales desde: ${this.gcpManager.getCredentialsSource()}`
-      );
     } catch (error) {
       console.error("Error inicializando Speech client:", error);
       throw new Error(

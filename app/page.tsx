@@ -80,10 +80,10 @@ export default function SofiaApp() {
   const handleTopicSelect = (topic: Topic) => {
     setUserQuestion(`Tema seleccionado: ${topic.title}`);
     setMessage(`Has seleccionado: ${topic.title}. ${topic.description}`);
-
-    setTimeout(() => {
+    router.push(`/${topic.intent}`);
+    /*     setTimeout(() => {
       router.push(`/${topic.intent}`);
-    }, 2000);
+    }, 2000); */
   };
 
   return (

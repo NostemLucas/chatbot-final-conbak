@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { List, ExternalLink, Maximize2, Gamepad2, Trophy } from "lucide-react";
+import { useState, useEffect } from "react";
+import { List, Gamepad2, Trophy } from "lucide-react";
 import AgentAvatar from "@/components/AgentAvatar";
 import ChatInput from "@/components/ChatInput";
 import ResponseDisplay from "@/components/ResponseDisplay";
@@ -12,14 +12,13 @@ import { Topic } from "@/types";
 import { useRouter } from "next/navigation";
 
 export default function SofiaApp() {
-  const [message, setMessage] = useState(
-    "¡Hola! Soy Sof-IA, tu asistente virtual de Yasta. ¿En qué puedo ayudarte hoy?"
-  );
-  const [userQuestion, setUserQuestion] = useState(""); // Nuevo estado para la pregunta del usuario
+  const [message, setMessage] = useState("");
+  const [userQuestion, setUserQuestion] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isTopicsOpen, setIsTopicsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -36,7 +35,8 @@ export default function SofiaApp() {
   const handleTextMessage = async (userMessage: string) => {
     setIsProcessing(true);
     setIsAnimating(true);
-    setUserQuestion(userMessage); // Guardar la pregunta del usuario
+    setUserQuestion(userMessage);
+    setIsInitialLoad(false); // Ya no es carga inicial
 
     try {
       const response = await sendTextMessage(userMessage);
@@ -52,13 +52,20 @@ export default function SofiaApp() {
     }
   };
 
+  useEffect(() => {
+    setMessage(
+      "¡Hola! Soy Sof-IA, tu asistente virtual de Yasta. ¿En qué puedo ayudarte hoy?"
+    );
+  }, []);
+
   const handleAudioMessage = async (audioBlob: Blob) => {
     setIsProcessing(true);
     setIsAnimating(true);
+    setIsInitialLoad(false); // Ya no es carga inicial
 
     try {
       const response = await sendAudioMessage(audioBlob);
-      // Asumir que el JSON también incluye la pregunta transcrita
+
       if (response.transcript) {
         setUserQuestion(response.transcript);
       } else {
@@ -80,10 +87,8 @@ export default function SofiaApp() {
   const handleTopicSelect = (topic: Topic) => {
     setUserQuestion(`Tema seleccionado: ${topic.title}`);
     setMessage(`Has seleccionado: ${topic.title}. ${topic.description}`);
+    setIsInitialLoad(false); // Ya no es carga inicial
     router.push(`/${topic.intent}`);
-    /*     setTimeout(() => {
-      router.push(`/${topic.intent}`);
-    }, 2000); */
   };
 
   return (
@@ -113,7 +118,7 @@ export default function SofiaApp() {
           <ResponseDisplay
             message={message}
             isProcessing={isProcessing}
-            autoSpeak={!isProcessing}
+            autoSpeak={isInitialLoad && !isProcessing}
           />
         </div>
 
@@ -134,7 +139,7 @@ export default function SofiaApp() {
             className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-xl flex items-center justify-center transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 font-semibold text-lg"
           >
             <List className="w-6 h-6 mr-3" />
-            Temas Sugeridos
+            Preguntas Frecuentes
           </button>
 
           {/* Botón Juegos con diseño diferente - estilo gaming */}

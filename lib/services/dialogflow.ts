@@ -49,9 +49,7 @@ export class DialogflowService {
       console.log(`Dialogflow client inicializado exitosamente`);
       console.log(`- Project ID: ${this.projectId}`);
       console.log(`- Language Code: ${this.languageCode}`);
-      console.log(
-        `- Credentials Source: ${this.gcpManager.getCredentialsSource()}`
-      );
+ 
     } catch (error) {
       console.error("Error inicializando Dialogflow client:", error);
       throw new Error(

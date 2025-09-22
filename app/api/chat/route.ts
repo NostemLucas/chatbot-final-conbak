@@ -38,3 +38,14 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export interface DialogflowResponse {
+  queryText: string;
+  fulfillmentText: string;
+  intent: string;   
+  confidence: number;
+}
+
+export interface DialogflowConfig {
+  projectId?: string;
+  languageCode?: string;
+}

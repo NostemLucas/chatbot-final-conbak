@@ -63,34 +63,54 @@ export default function SofiaApp() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 p-4">
-      <div className="max-w-4xl mx-auto">
-        <AgentAvatar isAnimating={isAnimating} imageUrl={"/avatar/smile.png"} />
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-4xl mx-auto flex flex-col justify-center min-h-[80vh]">
+        {/* Avatar centrado */}
+        <div className="flex justify-center mb-8">
+          <AgentAvatar
+            isAnimating={isAnimating}
+            imageUrl={"/avatar/smile.png"}
+          />
+        </div>
 
-        <ResponseDisplay
-          message={message}
-          isProcessing={isProcessing}
-          autoSpeak={!isProcessing}
-        />
+        {/* Respuesta centrada */}
+        <div className="mb-8">
+          <ResponseDisplay
+            message={message}
+            isProcessing={isProcessing}
+            autoSpeak={!isProcessing}
+          />
+        </div>
 
-        <ChatInput
-          onSendMessage={handleTextMessage}
-          onAudioRecorded={handleAudioMessage}
-          disabled={isProcessing}
-        />
+        {/* Input centrado */}
+        <div className="mb-8">
+          <ChatInput
+            onSendMessage={handleTextMessage}
+            onAudioRecorded={handleAudioMessage}
+            disabled={isProcessing}
+          />
+        </div>
 
-        <div className="text-center mt-6">
+        {/* Botón de temas centrado */}
+        <div className="flex justify-center mb-8">
           <button
             onClick={() => setIsTopicsOpen(true)}
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-xl flex items-center mx-auto transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 font-semibold"
+            className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-xl flex items-center transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 font-semibold text-lg"
           >
-            <List className="w-5 h-5 mr-2" />
+            <List className="w-6 h-6 mr-3" />
             Ver Todos los Temas
           </button>
         </div>
 
         {/* Slider de temas */}
-        <TopicsSlider topics={yastaTopics} onTopicSelect={handleTopicSelect} />
+        <div className="mb-6">
+          <TopicsSlider
+            topics={yastaTopics}
+            onTopicSelect={handleTopicSelect}
+          />
+        </div>
+
+        {/* Modal de temas */}
         <TopicsModal
           isOpen={isTopicsOpen}
           onClose={() => setIsTopicsOpen(false)}

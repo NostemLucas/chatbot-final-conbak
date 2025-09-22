@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Maximize2,
+  ArrowLeft,
 } from "lucide-react";
 import React, { useState, useCallback, useMemo } from "react";
 import Image from "next/image";
@@ -232,37 +233,50 @@ export default function SectionContent({ topic, handleClick }: ModalItemProps) {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
-        <div className="w-full max-w-xs sm:max-w-2xl lg:max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto bg-gradient-to-br from-slate-900 to-teal-900 border border-teal-500/40 text-teal-100 rounded-2xl sm:rounded-3xl shadow-2xl">
-          <div className="p-4 sm:p-6 lg:p-8">
-            {/* Header simplificado */}
-            <div className="mb-6 sm:mb-8 relative">
-              <div className="relative bg-slate-800/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-teal-500/30">
-                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                  <div className="relative">
+      {/* Contenedor principal de página centrada */}
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8 px-4">
+        {/* Botón de regreso */}
+        <div className="max-w-4xl mx-auto mb-6">
+          <button
+            onClick={() => router.push("/")}
+            className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors group"
+          >
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <span>Volver a temas</span>
+          </button>
+        </div>
+
+        {/* Contenido principal centrado */}
+        <article className="max-w-4xl mx-auto bg-gradient-to-br from-slate-800 to-teal-900 border border-teal-500/40 text-teal-100 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden">
+          <div className="p-6 sm:p-8 lg:p-10">
+            {/* Header */}
+            <header className="mb-8 sm:mb-10">
+              <div className="relative bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-teal-500/30">
+                <div className="flex flex-col sm:flex-row items-center gap-6">
+                  <div className="relative flex-shrink-0">
                     <div
-                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center shadow-xl border-2 border-white/30"
+                      className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl flex items-center justify-center shadow-xl border-2 border-white/30"
                       style={iconContainerStyle}
                     >
-                      <IconComponent className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+                      <IconComponent className="w-12 h-12 sm:w-14 sm:h-14 text-white" />
                     </div>
                   </div>
 
                   <div className="flex-1 text-center sm:text-left">
-                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-tight text-white mb-2">
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight text-white mb-3">
                       {title}
                     </h1>
-                    <div className="h-1 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full mt-2"></div>
+                    <div className="h-1 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full mb-4"></div>
 
-                    <div className="flex items-center justify-center sm:justify-start gap-3 mt-3">
-                      <div className="px-3 py-1 sm:px-4 sm:py-2 bg-teal-500/20 rounded-full border border-teal-400/50">
-                        <span className="text-sm sm:text-base text-teal-300 font-bold">
+                    <div className="flex items-center justify-center sm:justify-start gap-3 flex-wrap">
+                      <div className="px-4 py-2 bg-teal-500/20 rounded-full border border-teal-400/50">
+                        <span className="text-base text-teal-300 font-bold">
                           Tema #{id}
                         </span>
                       </div>
                       {hasVideo && (
-                        <div className="px-3 py-1 sm:px-4 sm:py-2 bg-purple-500/20 rounded-full border border-purple-400/50">
-                          <span className="text-sm sm:text-base text-purple-300 font-bold">
+                        <div className="px-4 py-2 bg-purple-500/20 rounded-full border border-purple-400/50">
+                          <span className="text-base text-purple-300 font-bold">
                             Con Video
                           </span>
                         </div>
@@ -271,12 +285,13 @@ export default function SectionContent({ topic, handleClick }: ModalItemProps) {
                   </div>
                 </div>
               </div>
-            </div>
+            </header>
 
-            <div className="space-y-6 sm:space-y-8">
-              {/* Video Section simplificado */}
+            {/* Contenido principal */}
+            <main className="space-y-8 sm:space-y-10">
+              {/* Video Section */}
               {hasVideo && (
-                <div className="relative">
+                <section className="relative">
                   <div className="aspect-video rounded-xl overflow-hidden bg-slate-800 shadow-xl border border-slate-600/50">
                     {urlVideo ? (
                       <div className="relative w-full h-full">
@@ -297,112 +312,104 @@ export default function SectionContent({ topic, handleClick }: ModalItemProps) {
                       </div>
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800 to-teal-900">
-                        <div className="text-center p-4">
-                          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-r from-cyan-500 to-teal-600 flex items-center justify-center mb-4 mx-auto shadow-xl">
-                            <Play className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                        <div className="text-center p-6">
+                          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-r from-cyan-500 to-teal-600 flex items-center justify-center mb-4 mx-auto shadow-xl">
+                            <Play className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
                           </div>
-                          <p className="text-lg sm:text-xl text-slate-300 mb-2">
+                          <p className="text-xl sm:text-2xl text-slate-300 mb-2">
                             {content.videoDescription}
                           </p>
-                          <p className="text-sm sm:text-base text-slate-400">
+                          <p className="text-base sm:text-lg text-slate-400">
                             Con explicación por voz detallada
                           </p>
                         </div>
                       </div>
                     )}
                   </div>
-                </div>
+                </section>
               )}
 
-              {/* Carrusel de Imágenes optimizado */}
+              {/* Carrusel de Imágenes */}
               {renderImageCarousel}
 
-              {/* Content Sections */}
-              <div className="space-y-4 sm:space-y-6">
-                <div className="bg-slate-800/50 rounded-xl p-4 sm:p-6 border border-slate-600/50">
-                  <h3 className="text-lg sm:text-xl font-semibold text-teal-300 mb-3 flex items-center">
-                    Introducción:
-                  </h3>
-                  <p className="text-base sm:text-lg leading-relaxed text-slate-200">
+              {/* Secciones de contenido */}
+              <div className="space-y-6 sm:space-y-8">
+                {/* Introducción */}
+                <section className="bg-slate-800/50 rounded-xl p-6 sm:p-8 border border-slate-600/50">
+                  <h2 className="text-2xl sm:text-3xl font-semibold text-teal-300 mb-4 flex items-center">
+                    Introducción
+                  </h2>
+                  <p className="text-lg sm:text-xl leading-relaxed text-slate-200">
                     {content.intro}
                   </p>
-                </div>
+                </section>
 
-                <div className="bg-slate-800/30 rounded-xl p-4 sm:p-6 border border-teal-500/30">
-                  <h3 className="text-lg sm:text-2xl font-semibold text-teal-300 mb-4 flex items-center">
-                    Pasos a seguir:
-                  </h3>
-                  <ul className="space-y-3 sm:space-y-4">
+                {/* Pasos */}
+                <section className="bg-slate-800/30 rounded-xl p-6 sm:p-8 border border-teal-500/30">
+                  <h2 className="text-2xl sm:text-3xl font-semibold text-teal-300 mb-6 flex items-center">
+                    Pasos a seguir
+                  </h2>
+                  <ol className="space-y-4 sm:space-y-6">
                     {content.steps.map((step, index) => (
                       <li
                         key={index}
-                        className="flex items-start gap-3 sm:gap-4"
+                        className="flex items-start gap-4 sm:gap-6"
                       >
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-lg">
-                          <span className="text-white text-sm sm:text-base font-bold">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600 flex items-center justify-center flex-shrink-0 mt-1 shadow-lg">
+                          <span className="text-white text-base sm:text-lg font-bold">
                             {index + 1}
                           </span>
                         </div>
-                        <span className="text-sm sm:text-lg text-slate-200 leading-relaxed">
+                        <p className="text-base sm:text-xl text-slate-200 leading-relaxed">
                           {step}
-                        </span>
+                        </p>
                       </li>
                     ))}
-                  </ul>
-                </div>
+                  </ol>
+                </section>
 
-                <div className="bg-gradient-to-r from-yellow-900/40 to-orange-900/40 rounded-xl p-4 sm:p-6 border border-yellow-500/30">
-                  <h3 className="text-lg sm:text-xl font-semibold text-yellow-300 mb-3 flex items-center">
-                    Tip importante:
-                  </h3>
-                  <p className="text-sm sm:text-lg text-slate-200 leading-relaxed">
+                {/* Tip importante */}
+                <section className="bg-gradient-to-r from-yellow-900/40 to-orange-900/40 rounded-xl p-6 sm:p-8 border border-yellow-500/30">
+                  <h2 className="text-2xl sm:text-3xl font-semibold text-yellow-300 mb-4 flex items-center">
+                    💡 Tip importante
+                  </h2>
+                  <p className="text-base sm:text-xl text-slate-200 leading-relaxed">
                     {content.tip}
                   </p>
-                </div>
+                </section>
               </div>
 
-              {/* Action Buttons simplificados */}
-              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 pt-6">
+              {/* Botones de acción */}
+              <footer className="flex flex-col sm:flex-row justify-center gap-4 pt-8 border-t border-slate-700/50">
                 <button
-                  onClick={() => {
-                    router.push("/");
-                  }}
-                  className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white text-lg sm:text-xl rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-bold"
+                  onClick={() => router.push("/")}
+                  className="px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white text-lg sm:text-xl rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-bold"
                 >
-                  <span className="hidden sm:inline">
-                    ¡Ya entendí!, volver a temas
-                  </span>
-                  <span className="sm:hidden">¡Entendí!</span>
+                  ¡Ya entendí! Volver a temas
                 </button>
 
                 {hasVideo && urlVideo && (
                   <button
                     onClick={toggleVideoFullscreen}
-                    className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white text-base sm:text-lg rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-medium flex items-center justify-center gap-2"
+                    className="px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white text-lg rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-medium flex items-center justify-center gap-2"
                   >
-                    <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span className="hidden sm:inline">
-                      Ver en pantalla completa
-                    </span>
-                    <span className="sm:hidden">Pantalla completa</span>
+                    <Play className="w-5 h-5" />
+                    Ver en pantalla completa
                   </button>
                 )}
 
                 {images && images.length > 0 && (
                   <button
                     onClick={() => openImageViewer(0)}
-                    className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-base sm:text-lg rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-medium flex items-center justify-center gap-2"
+                    className="px-6 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-lg rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-medium flex items-center justify-center gap-2"
                   >
-                    <span className="hidden sm:inline">
-                      Ver galería completa
-                    </span>
-                    <span className="sm:hidden">Ver galería</span>
+                    Ver galería completa
                   </button>
                 )}
-              </div>
-            </div>
+              </footer>
+            </main>
           </div>
-        </div>
+        </article>
       </div>
 
       {/* Video en pantalla completa */}
@@ -432,16 +439,15 @@ export default function SectionContent({ topic, handleClick }: ModalItemProps) {
         </div>
       )}
 
-      {/* Visor de imágenes optimizado */}
+      {/* Visor de imágenes */}
       {showImageViewer && images && selectedImage !== null && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[60]">
-          <div className="relative w-full max-w-xs sm:max-w-3xl max-h-full">
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 z-[60]">
+          <div className="relative w-full max-w-4xl max-h-full">
             <button
               onClick={closeImageViewer}
-              className="absolute -top-8 sm:-top-12 right-0 text-white text-lg sm:text-2xl hover:text-red-400 transition-colors z-10"
+              className="absolute -top-12 right-0 text-white text-2xl hover:text-red-400 transition-colors z-10"
             >
-              <span className="hidden sm:inline">✕ Cerrar</span>
-              <span className="sm:hidden">✕</span>
+              ✕ Cerrar
             </button>
 
             <div className="bg-white rounded-lg overflow-hidden shadow-2xl">
@@ -455,38 +461,37 @@ export default function SectionContent({ topic, handleClick }: ModalItemProps) {
                   priority
                 />
               </div>
-              <div className="p-4 sm:p-6 bg-white">
+              <div className="p-6 bg-white">
                 <div className="text-center">
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-2">
+                  <h3 className="text-xl font-bold text-slate-800 mb-2">
                     Paso {selectedImage + 1}
                   </h3>
-                  <p className="text-sm sm:text-base text-slate-600">
+                  <p className="text-base text-slate-600">
                     {images[selectedImage].description}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-between items-center mt-4 sm:mt-6">
+            <div className="flex justify-between items-center mt-6">
               <button
                 onClick={prevImage}
                 disabled={images.length <= 1}
-                className="px-3 sm:px-4 py-2 sm:py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                className="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span className="hidden sm:inline">← Anterior</span>
-                <span className="sm:hidden">←</span>
+                ← Anterior
               </button>
 
               <div className="text-white text-center">
-                <p className="text-sm sm:text-base font-medium">
+                <p className="text-base font-medium">
                   {selectedImage + 1} de {images.length}
                 </p>
-                <div className="flex gap-1 sm:gap-2 mt-2 justify-center">
+                <div className="flex gap-2 mt-2 justify-center">
                   {images.map((_, index) => (
                     <div
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer transition-colors ${
+                      className={`w-3 h-3 rounded-full cursor-pointer transition-colors ${
                         index === selectedImage
                           ? "bg-purple-400"
                           : "bg-slate-600"
@@ -499,10 +504,9 @@ export default function SectionContent({ topic, handleClick }: ModalItemProps) {
               <button
                 onClick={nextImage}
                 disabled={images.length <= 1}
-                className="px-3 sm:px-4 py-2 sm:py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                className="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span className="hidden sm:inline">Siguiente →</span>
-                <span className="sm:hidden">→</span>
+                Siguiente →
               </button>
             </div>
           </div>

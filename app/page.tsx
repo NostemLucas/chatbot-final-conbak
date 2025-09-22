@@ -9,6 +9,7 @@ import TopicsSlider from "@/components/TopicSlider";
 import { sendTextMessage, sendAudioMessage } from "@/lib/api";
 import { yastaTopics } from "@/data/topics";
 import { Topic } from "@/types";
+import { useRouter } from "next/navigation";
 
 export default function SofiaApp() {
   const [message, setMessage] = useState(
@@ -17,6 +18,8 @@ export default function SofiaApp() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isTopicsOpen, setIsTopicsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  const router = useRouter();
 
   const handleTextMessage = async (userMessage: string) => {
     setIsProcessing(true);
@@ -56,6 +59,7 @@ export default function SofiaApp() {
 
   const handleTopicSelect = (topic: Topic) => {
     setMessage(`Has seleccionado: ${topic.title}. ${topic.description}`);
+    router.push(`/${topic.intent}`);
   };
 
   return (
@@ -68,9 +72,6 @@ export default function SofiaApp() {
           isProcessing={isProcessing}
           autoSpeak={!isProcessing}
         />
-
-        {/* Slider de temas */}
-        <TopicsSlider topics={yastaTopics} onTopicSelect={handleTopicSelect} />
 
         <ChatInput
           onSendMessage={handleTextMessage}
@@ -88,6 +89,8 @@ export default function SofiaApp() {
           </button>
         </div>
 
+        {/* Slider de temas */}
+        <TopicsSlider topics={yastaTopics} onTopicSelect={handleTopicSelect} />
         <TopicsModal
           isOpen={isTopicsOpen}
           onClose={() => setIsTopicsOpen(false)}

@@ -1,3 +1,4 @@
+"use client";
 import {
   Play,
   Camera,
@@ -7,8 +8,9 @@ import {
   ChevronRight,
   Maximize2,
 } from "lucide-react";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface Topic {
   id: number;
@@ -33,15 +35,16 @@ interface Topic {
 
 interface ModalItemProps {
   topic: Topic;
-  handleClick: () => void;
+  handleClick?: () => void;
 }
 
-export default function ModalItem({ topic, handleClick }: ModalItemProps) {
+export default function SectionContent({ topic, handleClick }: ModalItemProps) {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const [showImageViewer, setShowImageViewer] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isVideoFullscreen, setIsVideoFullscreen] = useState(false);
 
+  const router = useRouter();
   const {
     color,
     content,
@@ -361,11 +364,13 @@ export default function ModalItem({ topic, handleClick }: ModalItemProps) {
               {/* Action Buttons simplificados */}
               <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 pt-6">
                 <button
-                  onClick={handleClick}
+                  onClick={() => {
+                    router.push("/");
+                  }}
                   className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white text-lg sm:text-xl rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-bold"
                 >
                   <span className="hidden sm:inline">
-                    ¡Perfecto, ya entendí!
+                    ¡Ya entendí!, volver a temas
                   </span>
                   <span className="sm:hidden">¡Entendí!</span>
                 </button>

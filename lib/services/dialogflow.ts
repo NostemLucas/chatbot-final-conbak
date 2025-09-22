@@ -1,19 +1,6 @@
 import { SessionsClient, protos } from "@google-cloud/dialogflow";
 import { GCPCredentialsManager } from "./gcp-credentials";
-
-export interface DialogflowResponse {
-  queryText: string;
-  fulfillmentText: string;
-  intent: string;
-  confidence: number;
-  parameters?: Record<string, any>;
-  languageCode: string;
-}
-
-export interface DialogflowConfig {
-  projectId?: string;
-  languageCode?: string;
-}
+import {DialogflowConfig,DialogflowResponse } from "@/types"
 
 export class DialogflowService {
   private sessionClient: SessionsClient;

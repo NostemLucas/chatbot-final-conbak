@@ -32,7 +32,7 @@ export default function AgentAvatar({
               src={imageUrl}
               alt="Agent"
               className={`rounded-full transition-all duration-500 ${
-                isExpanded ? "w-16 h-16" : "w-12 h-12"
+                isExpanded ? "w-42 h-42" : "w-36 h-36"
               }`}
             />
           ) : (

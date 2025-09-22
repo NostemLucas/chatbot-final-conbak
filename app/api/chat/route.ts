@@ -6,10 +6,10 @@ const dialogflowService = new DialogflowService();
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { text } = body;
-    console.log(body);
+    const { message } = body;
+    console.log('body ', body);
     // Validar que se proporcione el texto
-    if (!text || typeof text !== "string" || text.trim() === "") {
+    if (!message || typeof message !== "string" || message.trim() === "") {
       return NextResponse.json(
         { error: "No se proporcionó texto válido" },
         { status: 400 }
@@ -21,12 +21,12 @@ export async function POST(request: NextRequest) {
 
     // Enviar texto directamente a Dialogflow
     const dialogflowResponse = await dialogflowService.processText(
-      text.trim(),
+      message.trim(),
       finalSessionId
     );
     console.log(dialogflowResponse);
     return NextResponse.json({
-      transcipt: text.trim(),
+      transcipt: message.trim(),
       confidence: 1,
       dialogflow: dialogflowResponse,
     });

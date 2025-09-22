@@ -53,14 +53,6 @@ export default function ModalItem({ topic, handleClick }: ModalItemProps) {
     images,
   } = topic;
 
-  // Bloquear scroll del fondo cuando el modal está abierto
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, []);
-
   // Callbacks optimizados
   const openImageViewer = useCallback((index: number) => {
     setSelectedImage(index);

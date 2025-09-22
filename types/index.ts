@@ -1,9 +1,23 @@
 import { LucideIcon } from "lucide-react";
 
 export interface YastaResponse {
-  transcipt: string;
+  transcript: string;
   confidence: number;
-  dialogflow: any;
+  dialogflow: DialogflowResponse;
+}
+
+export interface DialogflowResponse {
+  queryText: string;
+  fulfillmentText: string;
+  intent: string;
+  confidence: number;
+  parameters?: Record<string, any>;
+  languageCode: string;
+}
+
+export interface DialogflowConfig {
+  projectId?: string;
+  languageCode?: string;
 }
 
 export interface Topic {

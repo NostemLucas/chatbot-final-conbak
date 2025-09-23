@@ -12,7 +12,9 @@ import { Topic } from "@/types";
 import { useRouter } from "next/navigation";
 
 export default function SofiaApp() {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(
+    "¡Hola! Soy Sof-IA, tu asistente virtual de Yasta. ¿En qué puedo ayudarte hoy?"
+  );
   const [userQuestion, setUserQuestion] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isTopicsOpen, setIsTopicsOpen] = useState(false);
@@ -51,12 +53,6 @@ export default function SofiaApp() {
       setIsAnimating(false);
     }
   };
-
-  useEffect(() => {
-    setMessage(
-      "¡Hola! Soy Sof-IA, tu asistente virtual de Yasta. ¿En qué puedo ayudarte hoy?"
-    );
-  }, []);
 
   const handleAudioMessage = async (audioBlob: Blob) => {
     setIsProcessing(true);

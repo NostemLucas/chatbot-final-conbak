@@ -89,7 +89,7 @@ export default function SofiaApp() {
 
   const handleTopicSelect = (topic: Topic) => {
     setUserQuestion(`Tema seleccionado: ${topic.title}`);
-    setMessage(`Has seleccionado: ${topic.title}. ${topic.description}`);
+    //setMessage(`Has seleccionado: ${topic.title}. ${topic.description}`);
     setIsInitialMessage(false); // Ya no es el mensaje inicial
     router.push(`/${topic.intent}`);
   };
@@ -191,6 +191,8 @@ export default function SofiaApp() {
           onClose={() => setIsTopicsOpen(false)}
           topics={yastaTopics}
           onTopicSelect={handleTopicSelect}
+          onFAQSelect={handleTextMessage}
+          showFAQ={true}
         />
       </div>
     </div>

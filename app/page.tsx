@@ -11,6 +11,7 @@ import { yastaTopics } from "@/data/topics";
 import { Topic } from "@/types";
 import { useRouter } from "next/navigation";
 import { WelcomeOverlay } from "@/components/WelcomeOverlay";
+import { useAudioContext } from "@/providers/AudioProvider";
 
 export default function SofiaApp() {
   const [message, setMessage] = useState(
@@ -21,6 +22,12 @@ export default function SofiaApp() {
   const [isTopicsOpen, setIsTopicsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Nuevo estado para controlar si es el mensaje inicial
+  const [isInitialMessage, setIsInitialMessage] = useState(true);
+
+  // Obtener el contexto de audio
+  const { hasUserInteracted } = useAudioContext();
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -38,6 +45,7 @@ export default function SofiaApp() {
     setIsProcessing(true);
     setIsAnimating(true);
     setUserQuestion(userMessage);
+    setIsInitialMessage(false); // Ya no es el mensaje inicial
 
     try {
       const response = await sendTextMessage(userMessage);
@@ -56,6 +64,7 @@ export default function SofiaApp() {
   const handleAudioMessage = async (audioBlob: Blob) => {
     setIsProcessing(true);
     setIsAnimating(true);
+    setIsInitialMessage(false); // Ya no es el mensaje inicial
 
     try {
       const response = await sendAudioMessage(audioBlob);
@@ -81,7 +90,14 @@ export default function SofiaApp() {
   const handleTopicSelect = (topic: Topic) => {
     setUserQuestion(`Tema seleccionado: ${topic.title}`);
     setMessage(`Has seleccionado: ${topic.title}. ${topic.description}`);
+    setIsInitialMessage(false); // Ya no es el mensaje inicial
     router.push(`/${topic.intent}`);
+  };
+
+  // Función para manejar cuando se activen los autoplay del overlay
+  const handleAutoPlayTriggered = () => {
+    // Marcar que ya no es el mensaje inicial para evitar reproductiones futuras
+    setIsInitialMessage(false);
   };
 
   return (
@@ -90,7 +106,8 @@ export default function SofiaApp() {
         title="¡Bienvenido al agente Sof-IA"
         subtitle="Toca la pantalla para activar el audio y disfrutar de la experiencia completa"
         buttonText="Comenzar experiencia"
-        showWhenPending={true} // Solo muestra cuando hay audios pendientes
+        showWhenPending={false} // Cambiar a false para que siempre aparezca
+        onAutoPlayTriggered={handleAutoPlayTriggered}
       />
       <div className="w-full max-w-4xl mx-auto flex flex-col justify-center min-h-[80vh]">
         {/* Avatar centrado */}
@@ -112,12 +129,14 @@ export default function SofiaApp() {
           </div>
         )}
 
-        {/* Respuesta centrada */}
+        {/* Respuesta centrada - SOLUCIÓN PRINCIPAL */}
         <div className="mb-8">
           <ResponseDisplay
             message={message}
             isProcessing={isProcessing}
-            autoSpeak={!isProcessing}
+            autoSpeak={
+              !isProcessing && (isInitialMessage ? false : hasUserInteracted)
+            }
           />
         </div>
 

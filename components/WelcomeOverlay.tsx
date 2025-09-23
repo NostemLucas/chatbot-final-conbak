@@ -119,8 +119,6 @@ export const WelcomeOverlay: React.FC<WelcomeOverlayProps> = ({
           <Hand className="w-5 h-5" />
           {buttonText}
         </button>
-
-        
       </div>
     </div>
   );

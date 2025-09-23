@@ -8,11 +8,11 @@ import {
   Gift,
   TrendingUp,
   LucideIcon,
+  Wallet,
 } from "lucide-react";
 
-
 // Estructura de datos actualizada
-export const yastaTopics:Topic[] = [
+export const yastaTopics: Topic[] = [
   {
     id: 1,
     title: "Enviar y recibir dinero",
@@ -286,5 +286,80 @@ export const yastaTopics:Topic[] = [
       tip: "Puedes solicitar el aumento de límites completando verificaciones adicionales en tu perfil.",
       videoDescription: "Explicación detallada de límites y cómo aumentarlos",
     },
+  },
+  {
+    id: 8,
+    title: "Wallet custodia de criptomonedas",
+    description:
+      "Descubre cómo funciona la wallet custodia de Efy Finance y sus beneficios de seguridad para tus activos digitales",
+    icon: Wallet,
+    color: "from-yellow-500 to-orange-600",
+    hasVideo: false,
+    intent: "wallet-custodia-criptos",
+    content: {
+      intro:
+        "La wallet custodia de Efy Finance te permite almacenar tus criptomonedas con la máxima seguridad, respaldada por tecnología robusta y cumplimiento de estándares internacionales.",
+      steps: [
+        "Regístrate en la plataforma Yasta con tu cuenta de Banco Unión",
+        "Completa el proceso de verificación de identidad",
+        "Accede a la sección de wallet custodia en la app",
+        "Deposita tus criptomonedas de forma segura",
+        "Disfruta de custodia regulada con protección avanzada",
+        "Gestiona tus activos digitales desde un solo lugar",
+      ],
+      tip: "La wallet custodia asegura tus activos digitales bajo un esquema de protección centralizada con los más altos estándares de seguridad internacional.",
+      videoDescription: "",
+    },
+    images: [],
+  },
+  {
+    id: 9,
+    title: "Comprar USDT con bolivianos",
+    description:
+      "Aprende cómo adquirir stablecoins USDT con bolivianos a la mejor tasa del mercado a través de la alianza Efy-Banco Unión",
+    icon: DollarSign,
+    color: "from-green-500 to-emerald-600",
+    hasVideo: false,
+    intent: "comprar-usdt-bolivianos",
+    content: {
+      intro:
+        "Con la alianza entre Efy Finance y Banco Unión, ahora puedes comprar USDT con bolivianos de forma regulada y segura, accediendo a la mejor tasa del mercado.",
+      steps: [
+        "Ingresa a tu wallet Yasta vinculada con Banco Unión",
+        "Selecciona la opción 'Comprar USDT'",
+        "Ingresa el monto en bolivianos que deseas convertir",
+        "Revisa la tasa de cambio ofrecida",
+        "Confirma la transacción desde tu cuenta bancaria",
+        "Recibe tus USDT instantáneamente en tu wallet custodia",
+      ],
+      tip: "Las stablecoins como USDT te brindan estabilidad en el valor, reduciendo la volatilidad típica de otras criptomonedas y garantizando mayor seguridad en tus inversiones.",
+      videoDescription: "",
+    },
+    images: [],
+  },
+  {
+    id: 10,
+    title: "Comprar USDT con bolivianos",
+    description:
+      "Aprende cómo adquirir stablecoins USDT con bolivianos a la mejor tasa del mercado a través de la alianza Efy-Banco Unión",
+    icon: DollarSign,
+    color: "from-green-500 to-emerald-600",
+    hasVideo: false,
+    intent: "comprar-usdt-bolivianos",
+    content: {
+      intro:
+        "Con la alianza entre Efy Finance y Banco Unión, ahora puedes comprar USDT con bolivianos de forma regulada y segura, accediendo a la mejor tasa del mercado.",
+      steps: [
+        "Ingresa a tu wallet Yasta vinculada con Banco Unión",
+        "Selecciona la opción 'Comprar USDT'",
+        "Ingresa el monto en bolivianos que deseas convertir",
+        "Revisa la tasa de cambio ofrecida",
+        "Confirma la transacción desde tu cuenta bancaria",
+        "Recibe tus USDT instantáneamente en tu wallet custodia",
+      ],
+      tip: "Las stablecoins como USDT te brindan estabilidad en el valor, reduciendo la volatilidad típica de otras criptomonedas y garantizando mayor seguridad en tus inversiones.",
+      videoDescription: "",
+    },
+    images: [],
   },
 ];

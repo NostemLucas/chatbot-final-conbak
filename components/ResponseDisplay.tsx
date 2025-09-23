@@ -1,5 +1,5 @@
 "use client";
-import TextToSpeech from "./TextToSpeech";
+import TextToSpeechGCP from "./TextToSpeechGCP";
 
 interface ResponseDisplayProps {
   message: string;
@@ -16,7 +16,11 @@ export default function ResponseDisplay({
     <div className="bg-slate-800/50 backdrop-blur-xl border-2 border-teal-500/40 shadow-2xl rounded-3xl mb-8">
       <div className="p-6">
         <div className="flex items-center justify-center mb-4">
-          <TextToSpeech text={message} autoPlay={autoSpeak} />
+          <TextToSpeechGCP
+            text={message}
+            autoPlay={autoSpeak}
+            voiceType="femaleLatina"
+          />
           <span className="text-2xl text-teal-300 font-bold ml-4">Sofía:</span>
         </div>
         <p className="text-xl text-teal-100 leading-relaxed text-center max-w-3xl mx-auto">

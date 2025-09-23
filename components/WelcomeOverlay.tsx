@@ -88,20 +88,6 @@ export const WelcomeOverlay: React.FC<WelcomeOverlayProps> = ({
             <Volume2 className="w-10 h-10 text-white" />
             <div className="absolute inset-0 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full animate-ping opacity-20"></div>
           </div>
-
-          {/* Partículas flotantes */}
-          <Sparkles
-            className="absolute top-2 right-8 w-4 h-4 text-teal-400 animate-bounce"
-            style={{ animationDelay: "0s" }}
-          />
-          <Sparkles
-            className="absolute top-8 left-4 w-3 h-3 text-blue-400 animate-bounce"
-            style={{ animationDelay: "0.5s" }}
-          />
-          <Sparkles
-            className="absolute bottom-2 right-4 w-3 h-3 text-purple-400 animate-bounce"
-            style={{ animationDelay: "1s" }}
-          />
         </div>
 
         {/* Contenido */}
@@ -134,10 +120,7 @@ export const WelcomeOverlay: React.FC<WelcomeOverlayProps> = ({
           {buttonText}
         </button>
 
-        {/* Texto de ayuda más claro */}
-        <p className="text-slate-400 text-xs mt-4">
-          Al tocar se reproducirán automáticamente los audios pendientes
-        </p>
+        
       </div>
     </div>
   );

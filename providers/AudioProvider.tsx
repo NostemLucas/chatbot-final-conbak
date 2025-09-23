@@ -6,6 +6,17 @@ import React, {
   useCallback,
   ReactNode,
 } from "react";
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertTriangle, XCircle, Wifi, Shield, HardDrive, Volume2 } from "lucide-react";
+
+interface AlertData {
+  id: string;
+  type: 'default' | 'destructive';
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  timestamp: number;
+}
 
 interface AudioContextType {
   hasUserInteracted: boolean;
@@ -13,10 +24,22 @@ interface AudioContextType {
   pendingAutoPlays: Set<string>;
   addPendingAutoPlay: (id: string) => void;
   removePendingAutoPlay: (id: string) => void;
-  triggerAutoPlay: (id: string) => void; // Nueva función para activar autoplay directamente
-  autoPlayCallbacks: Map<string, () => void>; // Callbacks para ejecutar autoplay
+  triggerAutoPlay: (id: string) => void;
+  autoPlayCallbacks: Map<string, () => void>;
   registerAutoPlayCallback: (id: string, callback: () => void) => void;
   unregisterAutoPlayCallback: (id: string) => void;
+  
+  // Sistema de alertas
+  alerts: AlertData[];
+  showAlert: (
+    type: 'default' | 'destructive',
+    title: string,
+    description: string,
+    icon: React.ReactNode,
+    duration?: number
+  ) => void;
+  dismissAlert: (id: string) => void;
+  clearAllAlerts: () => void;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
@@ -41,6 +64,7 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
   const [autoPlayCallbacks, setAutoPlayCallbacks] = useState<
     Map<string, () => void>
   >(new Map());
+  const [alerts, setAlerts] = useState<AlertData[]>([]);
 
   const setUserInteracted = useCallback(() => {
     setHasUserInteracted(true);
@@ -99,6 +123,42 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
     });
   }, []);
 
+  // Sistema de alertas
+  const showAlert = useCallback((
+    type: 'default' | 'destructive',
+    title: string,
+    description: string,
+    icon: React.ReactNode,
+    duration: number = 8000
+  ) => {
+    const id = `alert-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const newAlert: AlertData = {
+      id,
+      type,
+      title,
+      description,
+      icon,
+      timestamp: Date.now()
+    };
+
+    setAlerts(prev => [...prev, newAlert]);
+
+    // Auto-remover después del tiempo especificado
+    if (duration > 0) {
+      setTimeout(() => {
+        dismissAlert(id);
+      }, duration);
+    }
+  }, []);
+
+  const dismissAlert = useCallback((id: string) => {
+    setAlerts(prev => prev.filter(alert => alert.id !== id));
+  }, []);
+
+  const clearAllAlerts = useCallback(() => {
+    setAlerts([]);
+  }, []);
+
   const value = React.useMemo(
     () => ({
       hasUserInteracted,
@@ -110,6 +170,10 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
       autoPlayCallbacks,
       registerAutoPlayCallback,
       unregisterAutoPlayCallback,
+      alerts,
+      showAlert,
+      dismissAlert,
+      clearAllAlerts,
     }),
     [
       hasUserInteracted,
@@ -121,10 +185,37 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
       autoPlayCallbacks,
       registerAutoPlayCallback,
       unregisterAutoPlayCallback,
+      alerts,
+      showAlert,
+      dismissAlert,
+      clearAllAlerts,
     ]
   );
 
   return (
-    <AudioContext.Provider value={value}>{children}</AudioContext.Provider>
+    <AudioContext.Provider value={value}>
+      {/* Container de alertas */}
+      <div className="fixed top-4 right-4 z-50 space-y-2 max-w-md">
+        {alerts.map((alert) => (
+          <Alert 
+            key={alert.id} 
+            variant={alert.type}
+            className="shadow-lg border animate-in slide-in-from-right-full duration-300"
+          >
+            {alert.icon}
+            <AlertTitle>{alert.title}</AlertTitle>
+            <AlertDescription>{alert.description}</AlertDescription>
+            <button 
+              onClick={() => dismissAlert(alert.id)}
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <XCircle className="h-4 w-4" />
+            </button>
+          </Alert>
+        ))}
+      </div>
+      
+      {children}
+    </AudioContext.Provider>
   );
 };

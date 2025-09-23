@@ -10,6 +10,7 @@ import { sendTextMessage, sendAudioMessage } from "@/lib/api";
 import { yastaTopics } from "@/data/topics";
 import { Topic } from "@/types";
 import { useRouter } from "next/navigation";
+import { WelcomeOverlay } from "@/components/WelcomeOverlay";
 
 export default function SofiaApp() {
   const [message, setMessage] = useState(
@@ -85,6 +86,12 @@ export default function SofiaApp() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 flex items-center justify-center p-4">
+      <WelcomeOverlay
+        title="¡Bienvenido al agente Sof-IA"
+        subtitle="Toca la pantalla para activar el audio y disfrutar de la experiencia completa"
+        buttonText="Comenzar experiencia"
+        showWhenPending={true} // Solo muestra cuando hay audios pendientes
+      />
       <div className="w-full max-w-4xl mx-auto flex flex-col justify-center min-h-[80vh]">
         {/* Avatar centrado */}
         <div className="flex justify-center mb-8">

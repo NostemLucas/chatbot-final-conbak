@@ -1,6 +1,7 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useId, useCallback } from "react";
 import { Volume2, VolumeX, Loader2 } from "lucide-react";
+import { useAudioContext } from "../providers/AudioProvider";
 
 interface TextToSpeechProps {
   text: string;
@@ -19,16 +20,23 @@ export default function TextToSpeechGCP({
   autoPlay = false,
   voiceType = "femaleLatina",
 }: TextToSpeechProps) {
+  const componentId = useId();
+  const {
+    hasUserInteracted,
+    addPendingAutoPlay,
+    removePendingAutoPlay,
+    registerAutoPlayCallback,
+    unregisterAutoPlayCallback,
+  } = useAudioContext();
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasUserInteracted, setHasUserInteracted] = useState(false);
-  const [pendingAutoPlay, setPendingAutoPlay] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUrlRef = useRef<string | null>(null);
 
   // Cleanup function para liberar URLs de objeto
-  const cleanupAudio = () => {
+  const cleanupAudio = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
@@ -38,51 +46,9 @@ export default function TextToSpeechGCP({
       audioUrlRef.current = null;
     }
     setIsPlaying(false);
-  };
+  }, []);
 
-  useEffect(() => {
-    // Detectar primera interacción del usuario
-    const handleUserInteraction = () => {
-      setHasUserInteracted(true);
-      // Si había un autoplay pendiente, ejecutarlo ahora
-      if (pendingAutoPlay && text) {
-        playText();
-        setPendingAutoPlay(false);
-      }
-    };
-
-    if (!hasUserInteracted) {
-      document.addEventListener("click", handleUserInteraction, { once: true });
-      document.addEventListener("touchstart", handleUserInteraction, {
-        once: true,
-      });
-      document.addEventListener("keydown", handleUserInteraction, {
-        once: true,
-      });
-    }
-
-    return () => {
-      document.removeEventListener("click", handleUserInteraction);
-      document.removeEventListener("touchstart", handleUserInteraction);
-      document.removeEventListener("keydown", handleUserInteraction);
-    };
-  }, [hasUserInteracted, pendingAutoPlay, text]);
-
-  useEffect(() => {
-    if (autoPlay && text) {
-      if (hasUserInteracted) {
-        playText();
-      } else {
-        // Marcar como pendiente hasta que haya interacción
-        setPendingAutoPlay(true);
-      }
-    }
-
-    // Cleanup al desmontar el componente
-    return cleanupAudio;
-  }, [text, autoPlay, hasUserInteracted]);
-
-  const playText = async () => {
+  const playText = useCallback(async () => {
     if (!text || text.trim().length === 0) {
       setError("No hay texto para reproducir");
       return;
@@ -144,47 +110,15 @@ export default function TextToSpeechGCP({
         cleanupAudio();
       };
 
-      // Reproducir el audio con manejo de errores mejorado
-      try {
-        await audio.play();
-      } catch (playError) {
-        if (
-          playError instanceof Error &&
-          playError.name === "NotAllowedError"
-        ) {
-          setError("Necesitas hacer clic para activar el audio");
-          setPendingAutoPlay(true);
-        } else {
-          throw playError;
-        }
-      }
+      // Reproducir el audio
+      await audio.play();
     } catch (error) {
       console.error("Error en Text-to-Speech:", error);
       setError(error instanceof Error ? error.message : "Error desconocido");
       setIsLoading(false);
       setIsPlaying(false);
     }
-  };
-
-  const stopAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-    cleanupAudio();
-  };
-
-  const toggleSpeech = () => {
-    setHasUserInteracted(true);
-    setPendingAutoPlay(false);
-    setError(null);
-
-    if (isPlaying) {
-      stopAudio();
-    } else {
-      playText();
-    }
-  };
+  }, [text, voiceType, cleanupAudio]);
 
   // Función helper para convertir base64 a blob
   const base64ToBlob = (base64: string, mimeType: string): Blob => {
@@ -199,6 +133,74 @@ export default function TextToSpeechGCP({
     return new Blob([byteArray], { type: mimeType });
   };
 
+  // Registrar/desregistrar callback y manejar autoplay
+  useEffect(() => {
+    if (!autoPlay || !text) return;
+
+    if (hasUserInteracted) {
+      // Si ya hay interacción, reproducir inmediatamente
+      playText();
+    } else {
+      // Registrar callback para autoplay y agregarlo a pendientes
+      registerAutoPlayCallback(componentId, playText);
+      addPendingAutoPlay(componentId);
+    }
+
+    return () => {
+      unregisterAutoPlayCallback(componentId);
+      removePendingAutoPlay(componentId);
+    };
+  }, [
+    text,
+    autoPlay,
+    hasUserInteracted,
+    componentId,
+    playText,
+    registerAutoPlayCallback,
+    unregisterAutoPlayCallback,
+    addPendingAutoPlay,
+    removePendingAutoPlay,
+  ]);
+
+  // Cleanup al desmontar
+  useEffect(() => {
+    return () => {
+      cleanupAudio();
+      unregisterAutoPlayCallback(componentId);
+      removePendingAutoPlay(componentId);
+    };
+  }, [
+    componentId,
+    cleanupAudio,
+    unregisterAutoPlayCallback,
+    removePendingAutoPlay,
+  ]);
+
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    cleanupAudio();
+  };
+
+  const toggleSpeech = () => {
+    setError(null);
+
+    if (isPlaying) {
+      stopAudio();
+    } else {
+      if (!hasUserInteracted) {
+        setError("Toca el overlay para activar el audio");
+        return;
+      }
+      playText();
+    }
+  };
+
+  // Determinar si hay autoplay pendiente para este componente
+  const isPendingAutoPlay = autoPlay && !hasUserInteracted && text;
+
   return (
     <div className="flex items-center gap-2">
       <button
@@ -207,7 +209,7 @@ export default function TextToSpeechGCP({
         className={`p-3 rounded-full transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed relative ${
           isPlaying
             ? "bg-red-500/20 border border-red-400/50"
-            : pendingAutoPlay && !hasUserInteracted
+            : isPendingAutoPlay
             ? "bg-yellow-500/20 border border-yellow-400/50 animate-pulse"
             : "bg-teal-500/20 border border-teal-400/50"
         }`}
@@ -216,8 +218,8 @@ export default function TextToSpeechGCP({
             ? "Detener reproducción"
             : isLoading
             ? "Generando audio..."
-            : pendingAutoPlay && !hasUserInteracted
-            ? "Haz clic para activar el audio"
+            : isPendingAutoPlay
+            ? "Audio en espera - Toca el overlay"
             : "Reproducir texto"
         }
       >
@@ -229,12 +231,10 @@ export default function TextToSpeechGCP({
           <>
             <Volume2
               className={`w-6 h-6 ${
-                pendingAutoPlay && !hasUserInteracted
-                  ? "text-yellow-400"
-                  : "text-teal-400"
+                isPendingAutoPlay ? "text-yellow-400" : "text-teal-400"
               }`}
             />
-            {pendingAutoPlay && !hasUserInteracted && (
+            {isPendingAutoPlay && (
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
             )}
           </>
@@ -247,9 +247,9 @@ export default function TextToSpeechGCP({
         </span>
       )}
 
-      {pendingAutoPlay && !hasUserInteracted && !error && (
+      {isPendingAutoPlay && !error && (
         <span className="text-xs text-yellow-400 animate-pulse">
-          Clic para audio
+          Audio en espera
         </span>
       )}
     </div>

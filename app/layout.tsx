@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Analytics } from "@vercel/analytics/next";
-import "./globals.css";
+import { AudioProvider } from "../providers/AudioProvider";
 
+import "./globals.css";
 export const metadata: Metadata = {
   title: "App Yasta - Educación Financiera",
   description: "Created with love",
@@ -18,9 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        {children}
+        <AudioProvider>{children}</AudioProvider>
         <Analytics />
       </body>
     </html>
   );
 }
+

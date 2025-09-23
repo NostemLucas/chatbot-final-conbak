@@ -20,7 +20,6 @@ export default function SofiaApp() {
   const [isTopicsOpen, setIsTopicsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -38,7 +37,6 @@ export default function SofiaApp() {
     setIsProcessing(true);
     setIsAnimating(true);
     setUserQuestion(userMessage);
-    setIsInitialLoad(false); // Ya no es carga inicial
 
     try {
       const response = await sendTextMessage(userMessage);
@@ -57,7 +55,6 @@ export default function SofiaApp() {
   const handleAudioMessage = async (audioBlob: Blob) => {
     setIsProcessing(true);
     setIsAnimating(true);
-    setIsInitialLoad(false); // Ya no es carga inicial
 
     try {
       const response = await sendAudioMessage(audioBlob);
@@ -83,7 +80,6 @@ export default function SofiaApp() {
   const handleTopicSelect = (topic: Topic) => {
     setUserQuestion(`Tema seleccionado: ${topic.title}`);
     setMessage(`Has seleccionado: ${topic.title}. ${topic.description}`);
-    setIsInitialLoad(false); // Ya no es carga inicial
     router.push(`/${topic.intent}`);
   };
 
@@ -114,7 +110,7 @@ export default function SofiaApp() {
           <ResponseDisplay
             message={message}
             isProcessing={isProcessing}
-            autoSpeak={isInitialLoad && !isProcessing}
+            autoSpeak={!isProcessing}
           />
         </div>
 

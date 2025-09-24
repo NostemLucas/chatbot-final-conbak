@@ -70,12 +70,12 @@ export default function SofiaApp() {
       const response = await sendAudioMessage(audioBlob);
 
       let transcript = response.transcript || "Pregunta realizada por audio";
-   const yaEstaRegex = /\bya\s+est[aá]\b/gi;
+      const yaEstaRegex = /ya[\s,.;:!?-]*est[aá]/gi;
 
       if (yaEstaRegex.test(transcript)) {
-        transcript = transcript.replace(yaEstaRegex, "YASTA");
+        transcript = transcript.replace(yaEstaRegex, "yasta");
         console.log(
-          'Se detectó "YA ESTA" en el transcript, reemplazado por "YASTA"'
+          'Se detectó "YA ESTÁ" en el transcript, reemplazado por "YASTA"'
         );
       }
 

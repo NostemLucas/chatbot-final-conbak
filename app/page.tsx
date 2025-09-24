@@ -70,7 +70,7 @@ export default function SofiaApp() {
       const response = await sendAudioMessage(audioBlob);
 
       let transcript = response.transcript || "Pregunta realizada por audio";
-      const yaEstaRegex = /ya[\s,.;:!?-]*est[aá]/gi;
+      const yaEstaRegex = /ya\s*est[aá](?=[\s,?.!;:]|$)/gi;
 
       if (yaEstaRegex.test(transcript)) {
         transcript = transcript.replace(yaEstaRegex, "yasta");

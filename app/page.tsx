@@ -64,17 +64,22 @@ export default function SofiaApp() {
   const handleAudioMessage = async (audioBlob: Blob) => {
     setIsProcessing(true);
     setIsAnimating(true);
-    setIsInitialMessage(false); // Ya no es el mensaje inicial
+    setIsInitialMessage(false);
 
     try {
       const response = await sendAudioMessage(audioBlob);
 
-      if (response.transcript) {
-        setUserQuestion(response.transcript);
-      } else {
-        setUserQuestion("Pregunta realizada por audio");
+      let transcript = response.transcript || "Pregunta realizada por audio";
+      const yaEstaRegex = /\bya\s+esta\b/gi;
+
+      if (yaEstaRegex.test(transcript)) {
+        transcript = transcript.replace(yaEstaRegex, "YASTA");
+        console.log(
+          'Se detectó "YA ESTA" en el transcript, reemplazado por "YASTA"'
+        );
       }
 
+      setUserQuestion(transcript);
       setMessage(
         response.dialogflow.fulfillmentText ||
           "Lo siento, no pude procesar tu audio."

@@ -9,38 +9,100 @@ const clientOptions = gcpManager.getClientOptions();
 
 const vertexAI = new VertexAI({
   project: projectId,
-  location: "us-central1", // Cambia según tu región
+  location: "us-central1",
   googleAuthOptions: clientOptions,
 });
 
 /**
- * Webhook endpoint que Dialogflow llamará cuando no encuentre respuesta
- * Ruta sugerida: /api/vertex-webhook/route.ts
+ * Extrae texto de la respuesta de Vertex AI de forma robusta
+ */
+function extractTextFromResponse(response: any): string {
+  try {
+    // Método 1: Probar response.text() si existe
+    if (typeof response.text === "function") {
+      return response.text().trim();
+    }
+
+    // Método 2: Extraer de candidates
+    if (response.candidates && response.candidates.length > 0) {
+      const candidate = response.candidates[0];
+
+      if (
+        candidate.content &&
+        candidate.content.parts &&
+        candidate.content.parts.length > 0
+      ) {
+        const part = candidate.content.parts[0];
+        if (part.text) {
+          return part.text.trim();
+        }
+      }
+
+      // Fallback: buscar en cualquier nivel
+      const textContent = JSON.stringify(candidate).match(
+        /"text"\s*:\s*"([^"]+)"/
+      );
+      if (textContent && textContent[1]) {
+        return textContent[1].trim();
+      }
+    }
+
+    // Método 3: Buscar en toda la respuesta
+    const responseStr = JSON.stringify(response);
+    const textMatch = responseStr.match(/"text"\s*:\s*"([^"]+)"/);
+    if (textMatch && textMatch[1]) {
+      return textMatch[1].trim();
+    }
+
+    throw new Error("No se pudo extraer texto de la respuesta");
+  } catch (error) {
+    console.error("Error extrayendo texto:", error);
+    throw new Error(`Error procesando respuesta de Vertex AI: ${error}`);
+  }
+}
+
+/**
+ * Webhook endpoint para Dialogflow
  */
 export async function POST(request: NextRequest) {
   try {
     console.log("🚀 Webhook Vertex AI activado");
 
-    // Leer el cuerpo de la petición de Dialogflow
     const body = await request.json();
 
-    // Extraer información de la petición de Dialogflow
-    const {
-      queryResult: { queryText, intent, parameters, languageCode = "es" },
-      session,
-      originalDetectIntentRequest,
-    } = body;
+    // Log del body completo para debugging
+    console.log("📦 Body completo recibido:", JSON.stringify(body, null, 2));
 
-    console.log("📥 Datos recibidos de Dialogflow:", {
+    // Validar que el body tiene la estructura esperada
+    if (!body || typeof body !== "object") {
+      console.error("❌ Body inválido:", body);
+      return NextResponse.json({
+        fulfillmentText: "Error: Formato de petición inválido.",
+        source: "vertex-webhook-error",
+      });
+    }
+
+    // Extraer datos con validación
+    const queryResult = body.queryResult || {};
+    const queryText = queryResult.queryText || body.queryText || "";
+    const intent = queryResult.intent || body.intent;
+    const parameters = queryResult.parameters || body.parameters || {};
+    const languageCode = queryResult.languageCode || body.languageCode || "es";
+    const session = body.session || "unknown-session";
+
+    console.log("📥 Datos extraídos:", {
       queryText,
-      intent: intent?.displayName || "No detectado",
-      session: session?.split("/").pop(), // Solo el ID de sesión
+      intent: intent?.displayName || intent || "No detectado",
+      session: session?.split("/").pop() || session,
       languageCode,
+      hasParameters: Object.keys(parameters).length > 0,
     });
 
-    // Validar que tenemos el texto de la consulta
     if (!queryText || queryText.trim() === "") {
-      console.error("❌ No se recibió queryText de Dialogflow");
+      console.error("❌ No se recibió queryText válido");
+      console.error("Available keys in body:", Object.keys(body));
+      console.error("Available keys in queryResult:", Object.keys(queryResult));
+
       return NextResponse.json({
         fulfillmentText:
           "Lo siento, no pude procesar tu consulta. Por favor, intenta de nuevo.",
@@ -48,9 +110,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Configurar el modelo de Vertex AI
+    // Configurar el modelo
     const model = vertexAI.preview.getGenerativeModel({
-      model: "gemini-1.5-flash", // O el modelo que prefieras
+      model: "gemini-2.0-flash",
       systemInstruction: `
         Eres Yasta, un asistente virtual especializado y amigable.
         
@@ -60,7 +122,7 @@ export async function POST(request: NextRequest) {
         - Responde en español de manera clara y útil
         - Mantén un tono amigable y profesional
         - Si es una pregunta técnica muy específica, sugiere contactar soporte
-        - Limita tu respuesta a máximo 200 palabras para mantener la conversación fluida
+        - Limita tu respuesta a máximo 200 palabras
         - Si no puedes responder con certeza, dilo honestamente
         
         Usuario preguntó: "${queryText}"
@@ -75,32 +137,28 @@ export async function POST(request: NextRequest) {
 
     console.log("🤖 Enviando consulta a Vertex AI...");
 
-    // Generar respuesta con Vertex AI
+    // Generar respuesta
     const result = await model.generateContent(queryText);
     const response = result.response;
 
-    // Extraer el texto de la respuesta correctamente
-    const candidates = response.candidates;
-    if (!candidates || candidates.length === 0) {
-      throw new Error("No se generó respuesta de Vertex AI");
-    }
-
-    const generatedText = candidates[0].content.parts[0].text?.trim() || "";
-
     console.log(
-      "✅ Respuesta generada por Vertex AI:",
-      generatedText.substring(0, 100) + "..."
+      "🔍 Respuesta cruda de Vertex AI:",
+      JSON.stringify(response, null, 2)
     );
 
-    if (!generatedText) {
+    // Extraer texto de forma robusta
+    const generatedText = extractTextFromResponse(response);
+
+    console.log("✅ Texto extraído:", generatedText.substring(0, 100) + "...");
+
+    if (!generatedText || generatedText.length === 0) {
       throw new Error("Vertex AI no generó texto válido");
     }
 
-    // Responder a Dialogflow en el formato que espera
+    // Responder a Dialogflow
     const dialogflowResponse = {
       fulfillmentText: generatedText,
       source: "vertex-ai",
-      // Opcional: añadir contextos de salida si los necesitas
       outputContexts: [
         {
           name: `${session}/contexts/vertex-response`,
@@ -120,10 +178,18 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("❌ Error en webhook Vertex AI:", error);
 
-    // Respuesta de fallback si algo falla
+    // Log detallado del error para debugging
+    if (error instanceof Error) {
+      console.error("Error details:", {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+      });
+    }
+
     const errorResponse = {
       fulfillmentText:
-        "Disculpa, tengo problemas técnicos en este momento. ¿Podrías reformular tu pregunta o contactar con soporte?",
+        "Disculpa, tengo problemas técnicos en este momento. ¿Podrías reformular tu pregunta?",
       source: "vertex-webhook-error",
     };
 
@@ -132,12 +198,19 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Endpoint GET para verificar que el webhook está funcionando
- * Útil para debugging y monitoreo
+ * Health check endpoint
  */
 export async function GET(request: NextRequest) {
   try {
     console.log("🔍 Health check del webhook Vertex AI");
+
+    // Probar una consulta simple
+    const model = vertexAI.preview.getGenerativeModel({
+      model: "gemini-1.5-flash",
+    });
+
+    const testResult = await model.generateContent("Test de conexión");
+    const testText = extractTextFromResponse(testResult.response);
 
     return NextResponse.json({
       status: "healthy",
@@ -146,6 +219,7 @@ export async function GET(request: NextRequest) {
       project: projectId,
       model: "gemini-1.5-flash",
       ready: true,
+      test_response: testText.substring(0, 50) + "...",
       message: "Webhook listo para recibir peticiones de Dialogflow",
     });
   } catch (error) {
@@ -157,6 +231,7 @@ export async function GET(request: NextRequest) {
         service: "vertex-ai-webhook",
         timestamp: new Date().toISOString(),
         error: error instanceof Error ? error.message : "Error desconocido",
+        project: projectId,
       },
       { status: 500 }
     );

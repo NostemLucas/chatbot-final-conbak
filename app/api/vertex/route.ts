@@ -124,6 +124,7 @@ export async function POST(request: NextRequest) {
         - Si es una pregunta técnica muy específica, sugiere contactar soporte
         - Limita tu respuesta a máximo 200 palabras
         - Si no puedes responder con certeza, dilo honestamente
+        - Usa texto plano sin caarteres de md o similares solo texto natural.
         
         Usuario preguntó: "${queryText}"
       `,

@@ -35,16 +35,14 @@ export default function SofiaApp() {
 
   // Efecto para detectar si hemos navegado y regresado
   useEffect(() => {
-    // Si ya hemos interactuado antes y estamos en la página principal
-    const hasBeenHere = sessionStorage.getItem("hasVisitedMainPage");
+    // Si ya hemos visitado topics antes (no la página principal)
+    const hasVisitedTopics = sessionStorage.getItem("hasVisitedTopics");
 
-    if (hasBeenHere) {
+    if (hasVisitedTopics) {
       setHasNavigatedAway(true);
-      setIsInitialMessage(false);
       setShouldAutoPlay(false);
     } else {
-      // Primera vez en la página principal
-      sessionStorage.setItem("hasVisitedMainPage", "true");
+      // Primera vez o no hemos visitado topics
       setShouldAutoPlay(true);
     }
   }, []);
@@ -124,6 +122,10 @@ export default function SofiaApp() {
     setUserQuestion(`Tema seleccionado: ${topic.title}`);
     setIsInitialMessage(false);
     setHasNavigatedAway(true); // Marcamos que vamos a navegar
+
+    // Marcar en sessionStorage que hemos visitado topics
+    sessionStorage.setItem("hasVisitedTopics", "true");
+
     router.push(`/${topic.intent}`);
   };
 
@@ -133,23 +135,18 @@ export default function SofiaApp() {
 
   // Determinar si debemos reproducir audio
   const shouldPlayAudio = () => {
-    // No reproducir si hemos navegado y regresado
-    if (hasNavigatedAway && isInitialMessage) {
-      return false;
-    }
-
     // No reproducir si está procesando
     if (isProcessing) {
       return false;
     }
 
-    // Solo reproducir si:
-    // 1. Es el mensaje inicial Y no hemos navegado antes Y el usuario ha interactuado
-    // 2. O si shouldAutoPlay está habilitado (respuestas del chat)
-    return (
-      (isInitialMessage && !hasNavigatedAway && hasUserInteracted) ||
-      (!isInitialMessage && shouldAutoPlay && hasUserInteracted)
-    );
+    // Para el mensaje inicial: solo si no hemos navegado a topics antes
+    if (isInitialMessage) {
+      return !hasNavigatedAway && hasUserInteracted;
+    }
+
+    // Para respuestas del chat: siempre reproducir si shouldAutoPlay está habilitado
+    return shouldAutoPlay && hasUserInteracted;
   };
 
   return (

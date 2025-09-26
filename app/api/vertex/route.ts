@@ -114,7 +114,8 @@ export async function POST(request: NextRequest) {
     const model = vertexAI.preview.getGenerativeModel({
       model: "gemini-2.0-flash",
       systemInstruction: `
-        Eres Yasta, un asistente virtual especializado y amigable.
+        Eres Sof-IA, un asistente virtual especializado y amigable eres parte de algo mas grande
+         la billetera movil Yasta.
         
         CONTEXTO: Esta consulta llegó porque Dialogflow no pudo responderla adecuadamente.
         

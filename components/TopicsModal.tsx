@@ -42,6 +42,20 @@ const faqQuestions = [
   "¿Qué servicios de criptomonedas tienen?",
   "¿Dónde encuentro soporte y ayuda?",
   "¿Qué tarjetas crypto manejan?",
+  "¿Qué es una criptomoneda?",
+  "¿Qué es la tecnología blockchain y por qué es importante?",
+  "¿En qué se diferencia una criptomoneda como Bitcoin de una stablecoin como USDT?",
+  "¿Qué es una stablecoin?",
+  "¿Qué es USDT (Tether) y por qué se ha vuelto tan popular?",
+  "¿Cómo se respalda y mantiene estable el valor de una stablecoin como USDT?",
+  "¿Qué es una wallet y para qué sirve en el mundo cripto?",
+  "¿Qué ventajas tienen las stablecoins frente a los métodos de pago tradicionales?",
+  "¿Por qué las stablecoins están ganando terreno en países como Bolivia?",
+  "¿Qué debo tener en cuenta antes de empezar a usar criptomonedas o stablecoins?",
+  "¿Cuáles son los beneficios de las stablecoins?",
+  "¿Cómo están reguladas las stablecoins?",
+  "¿Qué servicios de criptomonedas tienen?",
+  "¿Qué tarjetas crypto manejan?",
 ];
 
 export default function TopicsModal({

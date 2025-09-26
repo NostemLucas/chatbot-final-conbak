@@ -23,11 +23,39 @@ export default function SofiaApp() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Nuevo estado para controlar si es el mensaje inicial
+  // Estados para controlar el audio
   const [isInitialMessage, setIsInitialMessage] = useState(true);
+  const [hasNavigatedAway, setHasNavigatedAway] = useState(false);
+  const [shouldAutoPlay, setShouldAutoPlay] = useState(false);
 
   // Obtener el contexto de audio
-  const { hasUserInteracted } = useAudioContext();
+  const { hasUserInteracted, currentPage } = useAudioContext();
+
+  const router = useRouter();
+
+  // Efecto para detectar si hemos navegado y regresado
+  useEffect(() => {
+    // Si ya hemos interactuado antes y estamos en la página principal
+    const hasBeenHere = sessionStorage.getItem("hasVisitedMainPage");
+
+    if (hasBeenHere) {
+      setHasNavigatedAway(true);
+      setIsInitialMessage(false);
+      setShouldAutoPlay(false);
+    } else {
+      // Primera vez en la página principal
+      sessionStorage.setItem("hasVisitedMainPage", "true");
+      setShouldAutoPlay(true);
+    }
+  }, []);
+
+  // Efecto para manejar cambios de página
+  useEffect(() => {
+    if (currentPage && currentPage !== "/") {
+      // El usuario navegó fuera de la página principal
+      setHasNavigatedAway(true);
+    }
+  }, [currentPage]);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -39,13 +67,12 @@ export default function SofiaApp() {
     }
   };
 
-  const router = useRouter();
-
   const handleTextMessage = async (userMessage: string) => {
     setIsProcessing(true);
     setIsAnimating(true);
     setUserQuestion(userMessage);
-    setIsInitialMessage(false); // Ya no es el mensaje inicial
+    setIsInitialMessage(false);
+    setShouldAutoPlay(true); // Permitir autoplay para respuestas del chat
 
     try {
       const response = await sendTextMessage(userMessage);
@@ -65,12 +92,13 @@ export default function SofiaApp() {
     setIsProcessing(true);
     setIsAnimating(true);
     setIsInitialMessage(false);
+    setShouldAutoPlay(true); // Permitir autoplay para respuestas del chat
 
     try {
       const response = await sendAudioMessage(audioBlob);
 
       let transcript = response.transcript || "Pregunta realizada por audio";
-      const yaEstaRegex = /ya\s*est[aá](?=[\s,?.!;:]|$)/gi;
+      const yaEstaRegex = /ya\s*est[aÃ¡](?=[\s,?.!;:]|$)/gi;
 
       if (yaEstaRegex.test(transcript)) {
         transcript = transcript.replace(yaEstaRegex, "yasta");
@@ -94,15 +122,34 @@ export default function SofiaApp() {
 
   const handleTopicSelect = (topic: Topic) => {
     setUserQuestion(`Tema seleccionado: ${topic.title}`);
-    //setMessage(`Has seleccionado: ${topic.title}. ${topic.description}`);
-    setIsInitialMessage(false); // Ya no es el mensaje inicial
+    setIsInitialMessage(false);
+    setHasNavigatedAway(true); // Marcamos que vamos a navegar
     router.push(`/${topic.intent}`);
   };
 
-  // Función para manejar cuando se activen los autoplay del overlay
   const handleAutoPlayTriggered = () => {
-    // Marcar que ya no es el mensaje inicial para evitar reproductiones futuras
     setIsInitialMessage(false);
+  };
+
+  // Determinar si debemos reproducir audio
+  const shouldPlayAudio = () => {
+    // No reproducir si hemos navegado y regresado
+    if (hasNavigatedAway && isInitialMessage) {
+      return false;
+    }
+
+    // No reproducir si está procesando
+    if (isProcessing) {
+      return false;
+    }
+
+    // Solo reproducir si:
+    // 1. Es el mensaje inicial Y no hemos navegado antes Y el usuario ha interactuado
+    // 2. O si shouldAutoPlay está habilitado (respuestas del chat)
+    return (
+      (isInitialMessage && !hasNavigatedAway && hasUserInteracted) ||
+      (!isInitialMessage && shouldAutoPlay && hasUserInteracted)
+    );
   };
 
   return (
@@ -111,7 +158,7 @@ export default function SofiaApp() {
         title="¡Bienvenido al agente Sof-IA"
         subtitle="Toca la pantalla para activar el audio y disfrutar de la experiencia completa"
         buttonText="Comenzar experiencia"
-        showWhenPending={false} // Cambiar a false para que siempre aparezca
+        showWhenPending={false}
         onAutoPlayTriggered={handleAutoPlayTriggered}
       />
       <div className="w-full max-w-4xl mx-auto flex flex-col justify-center min-h-[80vh]">
@@ -134,14 +181,12 @@ export default function SofiaApp() {
           </div>
         )}
 
-        {/* Respuesta centrada - SOLUCIÓN PRINCIPAL */}
+        {/* Respuesta centrada - CON CONTROL DE AUDIO MEJORADO */}
         <div className="mb-8">
           <ResponseDisplay
             message={message}
             isProcessing={isProcessing}
-            autoSpeak={
-              !isProcessing && (isInitialMessage ? false : hasUserInteracted)
-            }
+            autoSpeak={shouldPlayAudio()}
           />
         </div>
 

@@ -12,6 +12,7 @@ import {
 import React, { useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import TextToSpeechGCP from "./TextToSpeechGCP";
 
 interface Topic {
   id: number;
@@ -53,9 +54,16 @@ export default function SectionContent({ topic, handleClick }: ModalItemProps) {
     id,
     icon: IconComponent,
     title,
+    description,
     urlVideo,
     images,
   } = topic;
+
+  // Crear el texto completo para leer
+  const fullContentText = useMemo(() => {
+    const stepsText = content.steps.join(". ");
+    return `${title}. ${description}. ${content.intro}. Pasos a seguir: ${stepsText}. Tip importante: ${content.tip}`;
+  }, [title, description, content.intro, content.steps, content.tip]);
 
   // Callbacks optimizados
   const openImageViewer = useCallback((index: number) => {
@@ -249,7 +257,7 @@ export default function SectionContent({ topic, handleClick }: ModalItemProps) {
         {/* Contenido principal centrado */}
         <article className="max-w-4xl mx-auto bg-gradient-to-br from-slate-800 to-teal-900 border border-teal-500/40 text-teal-100 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden">
           <div className="p-6 sm:p-8 lg:p-10">
-            {/* Header */}
+            {/* Header con audio */}
             <header className="mb-8 sm:mb-10">
               <div className="relative bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-teal-500/30">
                 <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -263,9 +271,17 @@ export default function SectionContent({ topic, handleClick }: ModalItemProps) {
                   </div>
 
                   <div className="flex-1 text-center sm:text-left">
-                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight text-white mb-3">
-                      {title}
-                    </h1>
+                    <div className="flex items-center justify-center sm:justify-start gap-4 mb-3">
+                      <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight text-white">
+                        {title}
+                      </h1>
+                      {/* Componente de audio para leer todo el contenido */}
+                      <TextToSpeechGCP
+                        text={fullContentText}
+                        autoPlay={true}
+                        voiceType="femaleLatina"
+                      />
+                    </div>
                     <div className="h-1 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full mb-4"></div>
 
                     <div className="flex items-center justify-center sm:justify-start gap-3 flex-wrap">
